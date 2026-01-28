@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Search, CheckCircle, Clock, XCircle, AlertCircle } from 'lucide-react';
+import { Search, CheckCircle, Clock, XCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const StatusTracker = () => {
   const [caseId, setCaseId] = useState('');
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleCheckStatus = async (e) => {
     e.preventDefault();
@@ -26,11 +28,11 @@ const StatusTracker = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'Resolved': return <CheckCircle size={48} color="#22c55e" />;
-      case 'Investigating': return <Search size={48} color="#f59e0b" />;
-      case 'Dismissed': return <XCircle size={48} color="#ef4444" />;
-      case 'Pending': return <Clock size={48} color="#646cff" />;
-      default: return <AlertCircle size={48} color="#9ca3af" />;
+      case 'Resolved': return <CheckCircle size={64} color="#10b981" />;
+      case 'Investigating': return <Search size={64} color="#f59e0b" />;
+      case 'Dismissed': return <XCircle size={64} color="#ef4444" />;
+      case 'Pending': return <Clock size={64} color="#6366f1" />;
+      default: return <AlertCircle size={64} color="#9ca3af" />;
     }
   };
 
@@ -44,46 +46,78 @@ const StatusTracker = () => {
     }
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Resolved': return 'rgba(16, 185, 129, 0.1)';
+      case 'Investigating': return 'rgba(245, 158, 11, 0.1)';
+      case 'Dismissed': return 'rgba(239, 68, 68, 0.1)';
+      case 'Pending': return 'rgba(99, 102, 241, 0.1)';
+      default: return 'rgba(156, 163, 175, 0.1)';
+    }
+  };
+
   return (
-    <div className="container" style={{ textAlign: 'center', maxWidth: '600px' }}>
-      <h2 style={{ marginBottom: '2rem' }}>Track Case Status</h2>
-      
-      <form onSubmit={handleCheckStatus} style={{ marginBottom: '2rem' }}>
-        <input 
-          type="text" 
-          placeholder="Enter Case ID (e.g., 8A2F1C)" 
-          value={caseId}
-          onChange={(e) => setCaseId(e.target.value.toUpperCase())}
-          required
-          style={{ 
-            textAlign: 'center', 
-            fontSize: '1.2rem', 
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            marginBottom: '1rem'
-          }}
-        />
-        <button type="submit" className="primary-btn" disabled={loading}>
-          {loading ? 'Checking...' : 'Track Case'}
-        </button>
-      </form>
+    <div className="min-h-screen" style={{ padding: '2rem' }}>
+      <button 
+        onClick={() => navigate('/')} 
+        style={{ background: 'transparent', padding: 0, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}
+      >
+        <ArrowLeft size={20} /> Back to Home
+      </button>
 
-      {error && <div className="error">{error}</div>}
+      <div className="container" style={{ textAlign: 'center', maxWidth: '600px', marginTop: '4rem' }}>
+        <h1 style={{ marginBottom: '1rem' }}>Track Case Status</h1>
+        <p style={{ marginBottom: '3rem' }}>Enter your Case ID to check the progress of your report.</p>
+        
+        <div className="card" style={{ padding: '3rem 2rem' }}>
+          <form onSubmit={handleCheckStatus} style={{ marginBottom: '2rem' }}>
+            <div style={{ position: 'relative', maxWidth: '400px', margin: '0 auto' }}>
+              <input 
+                type="text" 
+                placeholder="CASE ID (e.g. 8A2F1C)" 
+                value={caseId}
+                onChange={(e) => setCaseId(e.target.value.toUpperCase())}
+                required
+                style={{ 
+                  textAlign: 'center', 
+                  fontSize: '1.5rem', 
+                  letterSpacing: '3px',
+                  textTransform: 'uppercase',
+                  padding: '1rem',
+                  borderRadius: '12px',
+                  fontWeight: 'bold',
+                  background: 'var(--bg-dark)'
+                }}
+              />
+            </div>
+            <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '1.5rem', minWidth: '200px' }}>
+              {loading ? 'Searching Database...' : 'Track Case'}
+            </button>
+          </form>
 
-      {status && (
-        <div style={{ 
-          background: 'rgba(255, 255, 255, 0.05)', 
-          padding: '2rem', 
-          borderRadius: '16px',
-          animation: 'fadeIn 0.5s ease'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            {getStatusIcon(status)}
-          </div>
-          <h3 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>{status}</h3>
-          <p style={{ opacity: 0.8 }}>{getStatusMessage(status)}</p>
+          {error && (
+            <div className="error animate-fade-in" style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px' }}>
+              {error}
+            </div>
+          )}
+
+          {status && (
+            <div className="animate-fade-in" style={{ 
+              background: getStatusColor(status), 
+              padding: '2rem', 
+              borderRadius: '16px',
+              marginTop: '2rem',
+              border: '1px solid rgba(255,255,255,0.05)'
+            }}>
+              <div style={{ marginBottom: '1rem' }}>
+                {getStatusIcon(status)}
+              </div>
+              <h2 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>{status}</h2>
+              <p style={{ opacity: 0.8, margin: 0 }}>{getStatusMessage(status)}</p>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
