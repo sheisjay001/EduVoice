@@ -115,7 +115,6 @@ const LandingPage = () => {
       }}>
         <div style={{ marginBottom: '1rem' }}>
           <a href="/status" style={{ color: 'var(--text-light)', textDecoration: 'none', margin: '0 1rem', fontWeight: 500 }}>Status Tracker</a>
-          <a href="/admin" style={{ color: 'var(--text-light)', textDecoration: 'none', margin: '0 1rem', fontWeight: 500 }}>Admin Access</a>
         </div>
         <p style={{ fontSize: '0.875rem' }}>&copy; {new Date().getFullYear()} Edu-Voice Platform. All rights reserved.</p>
       </footer>
