@@ -53,38 +53,70 @@ const LandingPage = () => {
           </p>
         </div>
 
-        {/* Action Card */}
-        <div className="glass-panel" style={{ maxWidth: '480px', margin: '0 auto', padding: '2.5rem', borderRadius: '24px' }}>
-          <h3 style={{ marginBottom: '0.5rem' }}>Verify Your Student Status</h3>
-          <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-            We use a "Stateless OTP" to verify you belong to an institution without linking the report to your ID.
-          </p>
-          
-          <form onSubmit={handleSendOtp} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div style={{ textAlign: 'left' }}>
-              <label htmlFor="email" style={{ fontSize: '0.875rem', fontWeight: 600, marginLeft: '4px' }}>Institutional Email</label>
-              <input
-                type="email"
-                id="email"
-                placeholder="student@university.edu.ng"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                style={{ marginTop: '0.5rem' }}
-              />
-            </div>
+        {/* Action Cards */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+          gap: '2rem', 
+          maxWidth: '900px', 
+          margin: '0 auto' 
+        }}>
+          {/* Verify Card */}
+          <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '24px' }}>
+            <h3 style={{ marginBottom: '0.5rem' }}>Verify Your Student Status</h3>
+            <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              We use a "Stateless OTP" to verify you belong to an institution without linking the report to your ID.
+            </p>
             
-            {error && (
-              <div className="error" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.2rem' }}>•</span> {error}
+            <form onSubmit={handleSendOtp} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ textAlign: 'left' }}>
+                <label htmlFor="email" style={{ fontSize: '0.875rem', fontWeight: 600, marginLeft: '4px' }}>Institutional Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="student@university.edu.ng"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{ marginTop: '0.5rem' }}
+                />
               </div>
-            )}
-            
-            <button type="submit" className="primary-btn" disabled={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
-              {loading ? 'Sending Code...' : 'Verify Identity'}
-              {!loading && <ArrowRight size={18} />}
-            </button>
-          </form>
+              
+              {error && (
+                <div className="error" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '1.2rem' }}>•</span> {error}
+                </div>
+              )}
+              
+              <button type="submit" className="primary-btn" disabled={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
+                {loading ? 'Sending Code...' : 'Verify Identity'}
+                {!loading && <ArrowRight size={18} />}
+              </button>
+            </form>
+          </div>
+
+          {/* Status Tracker Card */}
+          <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <h3 style={{ marginBottom: '0.5rem' }}>Track Report Status</h3>
+            <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              Already submitted a report? Use your Case ID to check the investigation status anonymously.
+            </p>
+            <div style={{ marginTop: 'auto' }}>
+               <button 
+                  onClick={() => navigate('/status')}
+                  className="primary-btn" 
+                  style={{ 
+                    width: '100%', 
+                    background: 'rgba(255,255,255,0.1)', 
+                    border: '1px solid var(--primary)',
+                    boxShadow: 'none'
+                  }}
+               >
+                Check Status
+                <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
