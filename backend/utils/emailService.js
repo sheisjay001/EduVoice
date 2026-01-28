@@ -7,8 +7,8 @@ const sendOTPEmail = async (studentEmail, otpCode) => {
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: 'novakidczechrepublic@gmail.com',
-        pass: 'tpft zvhz ujen csfj'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
       }
     });
 
