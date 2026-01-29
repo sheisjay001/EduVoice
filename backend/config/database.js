@@ -56,6 +56,7 @@ if (missingVars.length === 0) {
     console.error("❌ Sequelize Init Failed:", err.message);
     isMock = true;
     sequelize = {
+      initError: err.message, // Capture the initialization error
       authenticate: async () => console.log("⚠️  Mock DB Authenticated"),
       sync: async () => console.log("⚠️  Mock DB Synced"),
       define: (name, schema) => {
