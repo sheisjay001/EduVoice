@@ -54,8 +54,12 @@ exports.sendOtp = async (req, res) => {
       res.status(200).json({ message: 'OTP generated (Check Console for Dev Mode)' });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error sending OTP' });
+    console.error('CRITICAL OTP ERROR:', error);
+    res.status(500).json({ 
+      message: 'Server Error sending OTP',
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 

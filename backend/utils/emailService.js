@@ -36,6 +36,7 @@ const sendOTPEmail = async (studentEmail, otpCode) => {
 
   } catch (error) {
     console.error("❌ Email Failed:", error);
+    // Do NOT throw, just return false so we can fallback to 'dev mode' OTP
     return false;
   }
 };
