@@ -45,8 +45,14 @@ exports.sendOtp = async (req, res) => {
       await Otp.create({ email, otp, expiresAt });
     }
   } catch (dbError) {
-    console.warn("⚠️ Database unavailable. Using In-Memory Store.");
-    memoryStore[email] = { otp, expiresAt };
+    console.error("⚠️ DATABASE ERROR:", dbError);
+    // memoryStore[email] = { otp, expiresAt }; // DISABLE MEMORY FALLBACK ON VERCEL
+    
+    // Return explicit error so we know DB failed
+    return res.status(500).json({ 
+      message: 'Database Error: Could not save OTP', 
+      detail: dbError.message 
+    });
   }
 
   try {

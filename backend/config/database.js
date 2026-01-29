@@ -12,23 +12,41 @@ const DB_PASS = process.env.DB_PASS || process.env.TIDB_PASSWORD;
 const DB_PORT = process.env.DB_PORT || process.env.TIDB_PORT || 3306;
 
 if (DB_HOST && DB_NAME && DB_USER) {
-  sequelize = new Sequelize(
-    DB_NAME,
-    DB_USER,
-    DB_PASS,
-    {
-      host: DB_HOST,
-      port: DB_PORT,
-      dialect: 'mysql',
-      dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false
-        }
-      },
-      logging: console.log, // Enable logging to see connection errors
-    }
-  );
+  try {
+    sequelize = new Sequelize(
+      DB_NAME,
+      DB_USER,
+      DB_PASS,
+      {
+        host: DB_HOST,
+        port: DB_PORT,
+        dialect: 'mysql',
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false
+          }
+        },
+        logging: console.log, // Enable logging to see connection errors
+      }
+    );
+  } catch (err) {
+    console.error("❌ Sequelize Init Failed:", err.message);
+    isMock = true;
+    sequelize = {
+      authenticate: async () => console.log("⚠️  Mock DB Authenticated"),
+      sync: async () => console.log("⚠️  Mock DB Synced"),
+      define: (name, schema) => {
+        return {
+          name,
+          schema,
+          findOne: async () => null,
+          create: async () => ({}),
+          save: async () => {},
+        };
+      }
+    };
+  }
 } else {
   console.warn("⚠️  Missing Database Env Vars. Using Mock Sequelize (Offline Mode).");
   isMock = true;
