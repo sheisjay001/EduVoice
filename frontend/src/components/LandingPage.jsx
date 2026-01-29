@@ -24,7 +24,15 @@ const LandingPage = () => {
       await axios.post('/api/auth/send-otp', { email });
       navigate('/verify', { state: { email } });
     } catch (err) {
-      const msg = err.response?.data?.message || `Failed to send OTP (${err.response?.status || 'Network Error'}). Please try again.`;
+      // Prioritize "detail" if available (for database errors), otherwise "message"
+      const detail = err.response?.data?.detail;
+      const message = err.response?.data?.message;
+      
+      let msg = message || `Failed to send OTP (${err.response?.status || 'Network Error'}). Please try again.`;
+      if (detail) {
+        msg += ` Details: ${detail}`;
+      }
+      
       setError(msg);
     } finally {
       setLoading(false);
