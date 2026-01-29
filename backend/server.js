@@ -39,6 +39,8 @@ const startServer = async () => {
   // Start Server regardless of DB status
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(`Email User configured: ${process.env.EMAIL_USER ? 'Yes' : 'No'}`);
+    console.log(`DB Host: ${process.env.DB_HOST}`);
   });
 };
 

@@ -28,7 +28,7 @@ const VerifyOtp = () => {
       const { token } = res.data;
       navigate('/report', { state: { token } });
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid Code. Please try again.');
+      setError(err.response?.data?.message || `Invalid Code (${err.response?.status || 'Error'}). Please try again.`);
     } finally {
       setLoading(false);
     }
