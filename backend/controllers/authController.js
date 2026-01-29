@@ -91,16 +91,18 @@ exports.verifyOtp = async (req, res) => {
   console.log(`[VERIFY] Email: ${email}, OTP Input: ${otp}, OTP Stored: ${otpData?.otp || 'None'}`);
 
   if (!otpData) {
-    return res.status(400).json({ message: 'Invalid or expired OTP' });
+    return res.status(400).json({ message: 'Invalid or expired OTP (Code: 1)' });
   }
 
   // Check expiry
-  if (otpData.expiresAt < new Date()) {
+  if (new Date(otpData.expiresAt) < new Date()) {
+    console.log(`[VERIFY FAIL] Expired. Stored: ${otpData.expiresAt}, Now: ${new Date()}`);
     return res.status(400).json({ message: 'OTP has expired' });
   }
 
-  if (otpData.otp !== otp) {
-    return res.status(400).json({ message: 'Invalid OTP' });
+  if (String(otpData.otp).trim() !== String(otp).trim()) {
+    console.log(`[VERIFY FAIL] Mismatch. Stored: '${otpData.otp}', Input: '${otp}'`);
+    return res.status(400).json({ message: 'Invalid OTP (Code: 2)' });
   }
 
   // Cleanup
