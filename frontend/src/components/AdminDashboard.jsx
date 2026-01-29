@@ -40,22 +40,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const deleteAllReports = async () => {
-    if (!window.confirm("ARE YOU SURE? This will permanently delete ALL reports. This cannot be undone.")) {
-      return;
-    }
-
-    try {
-      await axios.delete('/api/reports');
-      setReports([]);
-      setDecryptedReports({});
-      alert("All reports have been deleted.");
-    } catch (error) {
-      console.error("Failed to delete reports:", error);
-      alert("Failed to delete reports. See console.");
-    }
-  };
-
   const decryptReport = (id, encryptedData) => {
     if (!privateKeyPem) {
       alert("Please enter the Private Key first.");
@@ -170,21 +154,6 @@ const AdminDashboard = () => {
             }}
           >
             <Map size={18} /> Heat Map
-          </button>
-          
-          <button 
-            onClick={deleteAllReports}
-            style={{ 
-              marginLeft: 'auto',
-              background: 'rgba(239, 68, 68, 0.1)',
-              color: 'var(--danger)',
-              border: '1px solid var(--danger)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}
-          >
-            <AlertCircle size={18} /> Delete All Reports
           </button>
         </div>
 

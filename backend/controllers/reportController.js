@@ -92,25 +92,6 @@ exports.getReports = async (req, res) => {
   }
 };
 
-// @desc    Delete all reports (Cleanup)
-// @route   DELETE /api/reports
-// @access  Private (Admin only)
-exports.deleteAllReports = async (req, res) => {
-  if (!sequelize.isMock) {
-    try {
-      await Report.destroy({ where: {}, truncate: true });
-      return res.status(200).json({ message: 'All reports deleted from Database.' });
-    } catch (error) {
-      console.error("❌ Database Error in deleteAllReports:", error);
-      return res.status(500).json({ message: 'Database Error', detail: error.message });
-    }
-  }
-
-  // Clear memory
-  memoryReports.length = 0;
-  res.status(200).json({ message: 'All reports deleted from Memory.' });
-};
-
 // @desc    Check case status
 // @route   GET /api/reports/:caseId/status
 // @access  Public
