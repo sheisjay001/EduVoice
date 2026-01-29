@@ -16,8 +16,12 @@ app.use((req, res, next) => {
 app.use(cors({
     origin: '*', // Allow all origins for now (adjust for production)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: '*', // Allow all headers to avoid CORS preflight issues
+    credentials: true
   }));
+  
+  // Explicitly handle OPTIONS for all routes
+  app.options('*', cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
