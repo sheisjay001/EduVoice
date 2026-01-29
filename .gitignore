@@ -22,3 +22,5 @@ logs/
 # Backend specific
 backend/uploads/
 backend/node_modules/
+backend/*.pem
+backend/private_key.pem
