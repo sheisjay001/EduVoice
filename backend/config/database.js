@@ -22,10 +22,17 @@ if (DB_HOST && DB_NAME && DB_USER) {
         port: DB_PORT,
         dialect: 'mysql',
         dialectOptions: {
+          connectTimeout: 10000, // 10 seconds timeout
           ssl: {
             require: true,
             rejectUnauthorized: false
           }
+        },
+        pool: {
+          max: 5,
+          min: 0,
+          acquire: 10000, // Fail after 10 seconds of trying to get connection
+          idle: 5000
         },
         logging: console.log, // Enable logging to see connection errors
       }
