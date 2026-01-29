@@ -6,7 +6,10 @@ import { Shield, Unlock, Map, FileText, LayoutList, Key, ChevronDown, ChevronUp,
 const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState('email'); // 'email', 'otp', 'dashboard'
+  const [loading, setLoading] = useState(false);
   const [privateKeyPem, setPrivateKeyPem] = useState('');
   const [decryptedReports, setDecryptedReports] = useState({});
   const [activeTab, setActiveTab] = useState('list'); // 'list' or 'heatmap'
@@ -18,12 +21,33 @@ const AdminDashboard = () => {
     }
   }, [isAuthenticated]);
 
-  const handleLogin = (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (password === 'admin123') {
-        setIsAuthenticated(true);
-    } else {
-        alert('Invalid Password');
+    setLoading(true);
+    try {
+      await axios.post('/api/auth/send-otp', { email });
+      setStep('otp');
+      alert(`OTP sent to ${email}`);
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.post('/api/auth/verify-otp', { email, otp });
+      setIsAuthenticated(true);
+      setStep('dashboard'); // Just to track state, though isAuthenticated handles view
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Invalid OTP");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,16 +114,60 @@ const AdminDashboard = () => {
           <Shield size={48} className="text-primary" style={{ marginBottom: '1rem', color: 'var(--primary)' }} />
           <h2 style={{ marginBottom: '0.5rem' }}>Admin Access</h2>
           <p style={{ marginBottom: '2rem' }}>Restricted Area. Authorized Personnel Only.</p>
-          <form onSubmit={handleLogin}>
-            <input
-              type="password"
-              placeholder="Enter Access Key"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{ textAlign: 'center' }}
-            />
-            <button type="submit" className="primary-btn" style={{ width: '100%' }}>Login</button>
-          </form>
+          
+          {step === 'email' ? (
+              <form onSubmit={handleSendOtp}>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', textAlign: 'left', marginBottom: '0.5rem', fontSize: '0.9rem' }}>School Email</label>
+                    <input
+                        type="email"
+                        placeholder="president@uni.edu.ng"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        style={{ textAlign: 'center', width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-dark)', color: 'white' }}
+                        required
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    className="primary-btn" 
+                    style={{ width: '100%' }}
+                    disabled={loading}
+                >
+                    {loading ? 'Sending...' : 'Get OTP'}
+                </button>
+              </form>
+          ) : (
+              <form onSubmit={handleVerifyOtp}>
+                <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', textAlign: 'left', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Enter OTP</label>
+                    <input
+                        type="text"
+                        placeholder="123456"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        style={{ textAlign: 'center', width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-dark)', color: 'white', letterSpacing: '4px', fontSize: '1.2rem' }}
+                        required
+                        maxLength={6}
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    className="primary-btn" 
+                    style={{ width: '100%' }}
+                    disabled={loading}
+                >
+                    {loading ? 'Verifying...' : 'Login'}
+                </button>
+                <button 
+                    type="button"
+                    onClick={() => setStep('email')}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', marginTop: '1rem', cursor: 'pointer', fontSize: '0.9rem' }}
+                >
+                    Change Email
+                </button>
+              </form>
+          )}
         </div>
       </div>
     );
