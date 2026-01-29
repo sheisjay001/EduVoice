@@ -3,13 +3,35 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
+const xss = require('xss-clean');
 const sequelize = require('./config/database');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-// app.use(helmet()); // Temporarily disabled for debugging
+// Security Middleware
+app.use(helmet()); // Set security HTTP headers
+
+// Rate Limiting (DDoS Protection)
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+app.use('/api/', limiter); // Apply to all API routes
+
+// Body Parser with limits (Buffer Overflow Protection)
+app.use(express.json({ limit: '10kb' })); 
+
+// Data Sanitization against XSS
+app.use(xss());
+
+// Prevent Parameter Pollution
+app.use(hpp());
+
+// Logging Middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
@@ -46,7 +68,7 @@ app.use(cors({
   
   // Explicitly handle OPTIONS for all routes
   app.options('*', cors());
-app.use(express.json());
+// app.use(express.json()); // REMOVED: Duplicate, already handled with limits above
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve uploaded files
 
 // Routes
