@@ -1,4 +1,8 @@
 const Report = require('../models/Report');
+const crypto = require('crypto');
+
+// In-Memory Fallback for Offline Mode
+const memoryReports = [];
 
 // @desc    Submit a new anonymous report
 // @route   POST /api/reports
@@ -34,8 +38,27 @@ exports.createReport = async (req, res) => {
       caseId: report.caseId 
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error submitting report' });
+    console.warn("⚠️ Database unavailable. Using In-Memory Store for Report.");
+    
+    const newReport = {
+      id: memoryReports.length + 1,
+      caseId: crypto.randomBytes(4).toString('hex').toUpperCase(),
+      faculty,
+      department,
+      courseCode,
+      encryptedOffender,
+      encryptedDescription,
+      evidence: evidenceFiles,
+      status: 'Pending',
+      createdAt: new Date()
+    };
+    
+    memoryReports.push(newReport);
+
+    res.status(201).json({ 
+      message: 'Report submitted successfully (Offline Mode)', 
+      caseId: newReport.caseId 
+    });
   }
 };
 
@@ -50,8 +73,8 @@ exports.getReports = async (req, res) => {
     });
     res.status(200).json(reports);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error fetching reports' });
+    console.warn("⚠️ Database unavailable. Fetching from In-Memory Store.");
+    res.status(200).json(memoryReports.sort((a, b) => b.createdAt - a.createdAt));
   }
 };
 
@@ -59,19 +82,28 @@ exports.getReports = async (req, res) => {
 // @route   GET /api/reports/:caseId/status
 // @access  Public
 exports.getReportStatus = async (req, res) => {
+  let status = null;
+
   try {
     const report = await Report.findOne({ 
       where: { caseId: req.params.caseId },
       attributes: ['status'] // Only return status, nothing else!
     });
 
-    if (!report) {
-      return res.status(404).json({ message: 'Case ID not found' });
+    if (report) {
+      status = report.status;
     }
-
-    res.status(200).json({ status: report.status });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error checking status' });
+    console.warn("⚠️ Database unavailable. Checking In-Memory Store.");
+    const report = memoryReports.find(r => r.caseId === req.params.caseId);
+    if (report) {
+      status = report.status;
+    }
   }
+
+  if (!status) {
+    return res.status(404).json({ message: 'Case ID not found' });
+  }
+
+  res.status(200).json({ status });
 };
