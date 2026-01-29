@@ -26,6 +26,7 @@ const DB_PORT = process.env.DB_PORT || process.env.TIDB_PORT || 3306;
 if (!DB_HOST) missingVars.push('DB_HOST or TIDB_HOST');
 if (!DB_NAME) missingVars.push('DB_NAME or TIDB_DATABASE');
 if (!DB_USER) missingVars.push('DB_USER or TIDB_USER');
+if (!DB_PASS) missingVars.push('DB_PASS or TIDB_PASSWORD');
 
 if (missingVars.length === 0) {
   try {
