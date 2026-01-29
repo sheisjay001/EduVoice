@@ -292,7 +292,7 @@ const AdminDashboard = () => {
                                     {safelyParseEvidence(report.evidence).map((file, idx) => (
                                         <a 
                                             key={idx} 
-                                            href={`http://localhost:5000/uploads/${file.filename}`} 
+                                            href={`http://localhost:5000/uploads/${file}`} 
                                             target="_blank" 
                                             rel="noopener noreferrer"
                                             style={{ 

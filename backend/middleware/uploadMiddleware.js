@@ -6,8 +6,10 @@ const os = require('os');
 // Configure Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Use /tmp for Vercel/Serverless, or uploads/ for local
-    const uploadDir = process.env.VERCEL ? os.tmpdir() : 'uploads/';
+    // Use /tmp for Vercel/Serverless, or backend/uploads/ for local
+    // We use path.join to ensure it goes to the correct backend/uploads folder regardless of CWD
+    const localUploadDir = path.join(__dirname, '..', 'uploads');
+    const uploadDir = process.env.VERCEL ? os.tmpdir() : localUploadDir;
     
     // Ensure directory exists (only for local 'uploads/', /tmp always exists)
     if (!process.env.VERCEL && !fs.existsSync(uploadDir)) {

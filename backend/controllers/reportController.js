@@ -18,7 +18,8 @@ exports.createReport = async (req, res) => {
   } = req.body;
 
   // Handle Files
-  const evidenceFiles = req.files ? req.files.map(file => file.path) : [];
+  // We store just the filename so we can serve it via static route /uploads/
+  const evidenceFiles = req.files ? req.files.map(file => file.filename) : [];
 
   if (!encryptedOffender || !encryptedDescription) {
     return res.status(400).json({ message: 'Encrypted data is missing' });

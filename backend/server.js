@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const sequelize = require('./config/database');
@@ -46,7 +47,7 @@ app.use(cors({
   // Explicitly handle OPTIONS for all routes
   app.options('*', cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads')); // Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve uploaded files
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
