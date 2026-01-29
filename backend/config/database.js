@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+const mysql2 = require('mysql2'); // Explicit require to force bundling
 require('dotenv').config();
 
 let sequelize;
@@ -36,6 +37,7 @@ if (missingVars.length === 0) {
         host: DB_HOST,
         port: DB_PORT,
         dialect: 'mysql',
+        dialectModule: mysql2, // Fix for Vercel/Webpack not bundling mysql2
         dialectOptions: {
           connectTimeout: 10000, // 10 seconds timeout
           ssl: {
