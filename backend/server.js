@@ -26,12 +26,25 @@ app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
 // Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/reports', require('./routes/reportRoutes'));
+const authRoutes = require('./routes/authRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+
+// Support both /api/auth and /auth (in case Vercel rewrites strip /api)
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/reports', '/reports'], reportRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Edu-Voice API', status: 'Running' });
+  res.json({ message: 'Welcome to Edu-Voice API', status: 'Running', timestamp: new Date() });
+});
+
+// Catch-all 404 handler for debugging Vercel routing
+app.use((req, res) => {
+  res.status(404).json({
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+    debug_url: req.url,
+    debug_method: req.method
+  });
 });
 
 // Database Connection & Server Start
