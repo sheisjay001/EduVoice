@@ -78,7 +78,7 @@ const AdminDashboard = () => {
          return Array.isArray(parsed) ? parsed : [];
       }
       return [];
-    } catch (e) {
+    } catch {
       return [];
     }
   };
