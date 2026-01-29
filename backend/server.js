@@ -14,10 +14,10 @@ app.use((req, res, next) => {
   next();
 });
 app.use(cors({
-  origin: '*', // Allow all origins for now (adjust for production)
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+    origin: '*', // Allow all origins for now (adjust for production)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
@@ -45,7 +45,7 @@ const startServer = async () => {
   }
 
   // Start Server regardless of DB status
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Email User configured: ${process.env.EMAIL_USER ? 'Yes' : 'No'}`);
     console.log(`DB Host: ${process.env.DB_HOST}`);
