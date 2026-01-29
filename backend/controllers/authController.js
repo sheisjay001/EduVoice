@@ -88,13 +88,6 @@ exports.verifyOtp = async (req, res) => {
     otpData = memoryStore[email];
   }
   
-  // 3. UNIVERSAL DEV BACKDOOR (Emergency Access for Demo)
-  // If connection is totally broken, allow '123456'
-  if (!otpData && otp === '123456') {
-     console.log(`[VERIFY] Using Universal Dev Backdoor for ${email}`);
-     otpData = { otp: '123456', expiresAt: new Date(Date.now() + 600000) };
-  }
-  
   // Debug Log for Vercel
   console.log(`[VERIFY] Email: ${email}, OTP Input: ${otp}, OTP Stored: ${otpData?.otp || 'None'}`);
 

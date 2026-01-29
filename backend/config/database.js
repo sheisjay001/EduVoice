@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+require('dotenv').config ();
 
 let sequelize;
 
@@ -12,13 +12,14 @@ if (process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER) {
       host: process.env.DB_HOST,
       port: process.env.DB_PORT,
       dialect: 'mysql',
-      dialectOptions: process.env.DB_HOST.includes('tidbcloud') ? {
+      dialectOptions: {
         ssl: {
           require: true,
           rejectUnauthorized: false
         }
-      } : {},
-      logging: false,
+      },
+      logging: console.log, // Enable logging to see connection errors
+    }
     }
   );
 } else {
