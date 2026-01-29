@@ -20,7 +20,6 @@ if (process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER) {
       },
       logging: console.log, // Enable logging to see connection errors
     }
-    }
   );
 } else {
   console.warn("⚠️  Missing Database Env Vars. Using Mock Sequelize (Offline Mode).");
