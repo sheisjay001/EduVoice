@@ -1,0 +1,16 @@
+{
+  "name": "edu-voice-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}
