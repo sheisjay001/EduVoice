@@ -24,6 +24,15 @@ exports.sendOtp = async (req, res) => {
   const otp = generateOTP();
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
+  // Check if we are in Mock Mode (No DB Connection)
+  const sequelize = require('../config/database');
+  if (sequelize.isMock) {
+    return res.status(500).json({ 
+      message: 'Database Configuration Error', 
+      detail: 'The application is running in Offline Mode because Database Environment Variables are missing. Please configure DB_HOST, DB_USER, etc. in Vercel Settings.'
+    });
+  }
+
   try {
     // Try Database First
     let otpRecord = await Otp.findOne({ where: { email } });
