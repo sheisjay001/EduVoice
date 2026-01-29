@@ -13,6 +13,29 @@ app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next();
 });
+
+// Database Initialization Middleware for Vercel
+let dbInitialized = false;
+const initDB = async () => {
+  if (dbInitialized) return;
+  try {
+    await sequelize.authenticate();
+    console.log('TiDB/MySQL Connected Successfully.');
+    await sequelize.sync();
+    console.log('Database Synced.');
+    dbInitialized = true;
+  } catch (error) {
+    console.error('DB Init Failed (Offline Mode):', error.message);
+  }
+};
+
+app.use(async (req, res, next) => {
+  if (!dbInitialized) {
+    await initDB();
+  }
+  next();
+});
+
 app.use(cors({
     origin: '*', // Allow all origins for now (adjust for production)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
