@@ -3,6 +3,7 @@ require('dotenv').config();
 
 let sequelize;
 let isMock = false;
+let missingVars = [];
 
 // DEBUG: Log loaded environment variables (masked)
 const mask = (str) => str ? (str.length > 5 ? '***' + str.slice(-5) : '***') : 'UNDEFINED';
@@ -21,7 +22,11 @@ const DB_USER = process.env.DB_USER || process.env.TIDB_USER;
 const DB_PASS = process.env.DB_PASS || process.env.TIDB_PASSWORD;
 const DB_PORT = process.env.DB_PORT || process.env.TIDB_PORT || 3306;
 
-if (DB_HOST && DB_NAME && DB_USER) {
+if (!DB_HOST) missingVars.push('DB_HOST or TIDB_HOST');
+if (!DB_NAME) missingVars.push('DB_NAME or TIDB_DATABASE');
+if (!DB_USER) missingVars.push('DB_USER or TIDB_USER');
+
+if (missingVars.length === 0) {
   try {
     sequelize = new Sequelize(
       DB_NAME,
@@ -85,4 +90,5 @@ if (DB_HOST && DB_NAME && DB_USER) {
 
 // Export both the instance and the isMock flag
 sequelize.isMock = isMock;
+sequelize.missingVars = missingVars;
 module.exports = sequelize;

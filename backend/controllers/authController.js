@@ -27,9 +27,10 @@ exports.sendOtp = async (req, res) => {
   // Check if we are in Mock Mode (No DB Connection)
   const sequelize = require('../config/database');
   if (sequelize.isMock) {
+    const missing = sequelize.missingVars ? sequelize.missingVars.join(', ') : 'Unknown';
     return res.status(500).json({ 
       message: 'Database Configuration Error', 
-      detail: 'Database Environment Variables are missing. Check Vercel Function Logs for "🔍 [DB Config]" to see which variables are undefined.'
+      detail: `Missing Environment Variables: ${missing}. Check Vercel Settings.`
     });
   }
 
