@@ -29,7 +29,7 @@ exports.sendOtp = async (req, res) => {
   if (sequelize.isMock) {
     return res.status(500).json({ 
       message: 'Database Configuration Error', 
-      detail: 'The application is running in Offline Mode because Database Environment Variables are missing. Please configure DB_HOST, DB_USER, etc. in Vercel Settings.'
+      detail: 'Database Environment Variables are missing. Check Vercel Function Logs for "🔍 [DB Config]" to see which variables are undefined.'
     });
   }
 

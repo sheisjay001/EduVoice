@@ -1,8 +1,18 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config ();
+require('dotenv').config();
 
 let sequelize;
 let isMock = false;
+
+// DEBUG: Log loaded environment variables (masked)
+const mask = (str) => str ? (str.length > 5 ? '***' + str.slice(-5) : '***') : 'UNDEFINED';
+console.log("🔍 [DB Config] Checking Environment Variables...");
+console.log(`- DB_HOST: ${mask(process.env.DB_HOST)}`);
+console.log(`- TIDB_HOST: ${mask(process.env.TIDB_HOST)}`);
+console.log(`- DB_USER: ${mask(process.env.DB_USER)}`);
+console.log(`- TIDB_USER: ${mask(process.env.TIDB_USER)}`);
+console.log(`- DB_NAME: ${mask(process.env.DB_NAME)}`);
+console.log(`- TIDB_DATABASE: ${mask(process.env.TIDB_DATABASE)}`);
 
 // Support both standard DB_ vars and Vercel/TiDB specific TIDB_ vars
 const DB_HOST = process.env.DB_HOST || process.env.TIDB_HOST;
