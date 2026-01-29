@@ -67,7 +67,9 @@ exports.sendOtp = async (req, res) => {
 // @route   POST /api/auth/verify-otp
 // @access  Public
 exports.verifyOtp = async (req, res) => {
-  const { email, otp } = req.body;
+  let { email, otp } = req.body;
+  email = email ? email.toLowerCase() : ''; // Normalize email
+
   let otpData = null;
   let fromDb = false;
 
@@ -79,12 +81,11 @@ exports.verifyOtp = async (req, res) => {
       fromDb = true;
     }
   } catch (err) {
-    console.warn("⚠️ DB check failed. Checking Memory Store.");
+    console.warn("⚠️ DB check failed:", err.message);
   }
 
-  // 2. Try Memory (Always check memory as backup)
+  // 2. Try Memory (Backup)
   if (!otpData && memoryStore[email]) {
-    console.log(`[VERIFY] Found in Memory Store: ${email}`);
     otpData = memoryStore[email];
   }
   
@@ -92,7 +93,10 @@ exports.verifyOtp = async (req, res) => {
   console.log(`[VERIFY] Email: ${email}, OTP Input: ${otp}, OTP Stored: ${otpData?.otp || 'None'}`);
 
   if (!otpData) {
-    return res.status(400).json({ message: 'Invalid or expired OTP (Code: 1)' });
+    return res.status(400).json({ 
+      message: 'Invalid or expired OTP (Code: 1 - Not Found)',
+      debug: 'OTP not found in DB or Memory. Check DB connection.'
+    });
   }
 
   // Check expiry
