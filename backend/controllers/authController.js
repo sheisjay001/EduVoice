@@ -86,6 +86,9 @@ exports.verifyOtp = async (req, res) => {
   if (!otpData && memoryStore[email]) {
     otpData = memoryStore[email];
   }
+  
+  // Debug Log for Vercel
+  console.log(`[VERIFY] Email: ${email}, OTP Input: ${otp}, OTP Stored: ${otpData?.otp || 'None'}`);
 
   if (!otpData) {
     return res.status(400).json({ message: 'Invalid or expired OTP' });
