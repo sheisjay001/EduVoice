@@ -1,5 +1,6 @@
 const Report = require('../models/Report');
 const crypto = require('crypto');
+const sequelize = require('../config/database'); // Import sequelize to check isMock
 
 // In-Memory Fallback for Offline Mode
 const memoryReports = [];
@@ -23,43 +24,55 @@ exports.createReport = async (req, res) => {
     return res.status(400).json({ message: 'Encrypted data is missing' });
   }
 
-  try {
-    const report = await Report.create({
-      faculty,
-      department,
-      courseCode,
-      encryptedOffender,
-      encryptedDescription,
-      evidence: evidenceFiles
-    });
+  // If using real DB, try to save there
+  if (!sequelize.isMock) {
+    try {
+      const report = await Report.create({
+        faculty,
+        department,
+        courseCode,
+        encryptedOffender,
+        encryptedDescription,
+        evidence: evidenceFiles
+      });
 
-    res.status(201).json({ 
-      message: 'Report submitted successfully', 
-      caseId: report.caseId 
-    });
-  } catch (error) {
-    console.warn("⚠️ Database unavailable. Using In-Memory Store for Report.");
-    
-    const newReport = {
-      id: memoryReports.length + 1,
-      caseId: crypto.randomBytes(4).toString('hex').toUpperCase(),
-      faculty,
-      department,
-      courseCode,
-      encryptedOffender,
-      encryptedDescription,
-      evidence: evidenceFiles,
-      status: 'Pending',
-      createdAt: new Date()
-    };
-    
-    memoryReports.push(newReport);
-
-    res.status(201).json({ 
-      message: 'Report submitted successfully (Offline Mode)', 
-      caseId: newReport.caseId 
-    });
+      return res.status(201).json({ 
+        message: 'Report submitted successfully', 
+        caseId: report.caseId 
+      });
+    } catch (error) {
+      console.error("❌ Database Error in createReport:", error);
+      
+      // Return detailed error if DB connection exists but query failed
+      return res.status(500).json({ 
+        message: 'Database Error', 
+        detail: error.message 
+      });
+    }
   }
+
+  // Fallback to Memory only if isMock is true (Offline Mode)
+  console.warn("⚠️ Using In-Memory Store for Report (Offline Mode).");
+    
+  const newReport = {
+    id: memoryReports.length + 1,
+    caseId: crypto.randomBytes(4).toString('hex').toUpperCase(),
+    faculty,
+    department,
+    courseCode,
+    encryptedOffender,
+    encryptedDescription,
+    evidence: evidenceFiles,
+    status: 'Pending',
+    createdAt: new Date()
+  };
+  
+  memoryReports.push(newReport);
+
+  res.status(201).json({ 
+    message: 'Report submitted successfully (Offline Mode)', 
+    caseId: newReport.caseId 
+  });
 };
 
 // @desc    Get all reports (For Admin Dashboard)

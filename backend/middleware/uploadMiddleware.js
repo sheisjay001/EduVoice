@@ -1,10 +1,20 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
 
 // Configure Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    // Use /tmp for Vercel/Serverless, or uploads/ for local
+    const uploadDir = process.env.VERCEL ? os.tmpdir() : 'uploads/';
+    
+    // Ensure directory exists (only for local 'uploads/', /tmp always exists)
+    if (!process.env.VERCEL && !fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     // Unique filename: fieldname-timestamp-random.ext
