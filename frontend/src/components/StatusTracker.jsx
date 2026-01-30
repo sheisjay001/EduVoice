@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const StatusTracker = () => {
   const [caseId, setCaseId] = useState('');
-  const [status, setStatus] = useState(null);
+  const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -14,11 +14,11 @@ const StatusTracker = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setStatus(null);
+    setReportData(null);
 
     try {
       const res = await axios.get(`/api/reports/${caseId}/status`);
-      setStatus(res.data.status);
+      setReportData(res.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Case ID not found or server error.');
     } finally {
@@ -101,19 +101,55 @@ const StatusTracker = () => {
             </div>
           )}
 
-          {status && (
-            <div className="animate-fade-in" style={{ 
-              background: getStatusColor(status), 
-              padding: '2rem', 
-              borderRadius: '16px',
-              marginTop: '2rem',
-              border: '1px solid rgba(255,255,255,0.05)'
-            }}>
-              <div style={{ marginBottom: '1rem' }}>
-                {getStatusIcon(status)}
-              </div>
-              <h2 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>{status}</h2>
-              <p style={{ opacity: 0.8, margin: 0 }}>{getStatusMessage(status)}</p>
+          {reportData && (
+            <div className="animate-fade-in">
+                {/* Main Status */}
+                <div style={{ 
+                  background: getStatusColor(reportData.status), 
+                  padding: '2rem', 
+                  borderRadius: '16px',
+                  marginTop: '2rem',
+                  border: '1px solid rgba(255,255,255,0.05)'
+                }}>
+                  <div style={{ marginBottom: '1rem' }}>
+                    {getStatusIcon(reportData.status)}
+                  </div>
+                  <h2 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>{reportData.status}</h2>
+                  <p style={{ opacity: 0.8, margin: 0 }}>{getStatusMessage(reportData.status)}</p>
+                </div>
+
+                {/* Tracking Steps */}
+                <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {/* Viewed Step */}
+                    <div style={{ 
+                        display: 'flex', alignItems: 'center', gap: '1rem', 
+                        padding: '1rem', background: 'var(--bg-dark)', borderRadius: '12px',
+                        opacity: reportData.viewed ? 1 : 0.5
+                    }}>
+                        {reportData.viewed ? <CheckCircle color="var(--success)" /> : <div style={{width: 24, height: 24, border: '2px solid var(--text-muted)', borderRadius: '50%'}} />}
+                        <div style={{ textAlign: 'left' }}>
+                            <div style={{ fontWeight: 'bold' }}>Viewed by Admin</div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                {reportData.viewed ? 'Your report has been opened and reviewed.' : 'Pending review.'}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Forwarded Step */}
+                    <div style={{ 
+                        display: 'flex', alignItems: 'center', gap: '1rem', 
+                        padding: '1rem', background: 'var(--bg-dark)', borderRadius: '12px',
+                        opacity: reportData.forwarded ? 1 : 0.5
+                    }}>
+                        {reportData.forwarded ? <CheckCircle color="var(--primary)" /> : <div style={{width: 24, height: 24, border: '2px solid var(--text-muted)', borderRadius: '50%'}} />}
+                        <div style={{ textAlign: 'left' }}>
+                            <div style={{ fontWeight: 'bold' }}>Forwarded to Authorities</div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                {reportData.forwarded ? 'Escalated to appropriate university body.' : 'Not yet escalated.'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
           )}
         </div>

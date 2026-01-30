@@ -137,28 +137,69 @@ exports.getReports = async (req, res) => {
 // @route   GET /api/reports/:caseId/status
 // @access  Public
 exports.getReportStatus = async (req, res) => {
-  let status = null;
+  let result = null;
 
   try {
     const report = await Report.findOne({ 
       where: { caseId: req.params.caseId },
-      attributes: ['status'] // Only return status, nothing else!
+      attributes: ['status', 'viewed', 'forwarded'] // Return status and flags
     });
 
     if (report) {
-      status = report.status;
+      result = {
+        status: report.status,
+        viewed: report.viewed,
+        forwarded: report.forwarded
+      };
     }
   } catch (error) {
     console.warn("⚠️ Database unavailable. Checking In-Memory Store.");
     const report = memoryReports.find(r => r.caseId === req.params.caseId);
     if (report) {
-      status = report.status;
+      result = {
+        status: report.status,
+        viewed: report.viewed || false,
+        forwarded: report.forwarded || false
+      };
     }
   }
 
-  if (!status) {
+  if (!result) {
     return res.status(404).json({ message: 'Case ID not found' });
   }
 
-  res.status(200).json({ status });
+  res.status(200).json(result);
+};
+
+// @desc    Update report flags (viewed, forwarded)
+// @route   PATCH /api/reports/:caseId/flags
+// @access  Private (Admin only)
+exports.updateReportFlags = async (req, res) => {
+  const { viewed, forwarded } = req.body;
+  const { caseId } = req.params;
+
+  try {
+    const report = await Report.findOne({ where: { caseId } });
+
+    if (!report) {
+        // Check memory store fallback
+        const memReport = memoryReports.find(r => r.caseId === caseId);
+        if (memReport) {
+            if (viewed !== undefined) memReport.viewed = viewed;
+            if (forwarded !== undefined) memReport.forwarded = forwarded;
+            return res.status(200).json(memReport);
+        }
+        return res.status(404).json({ message: 'Report not found' });
+    }
+
+    if (viewed !== undefined) report.viewed = viewed;
+    if (forwarded !== undefined) report.forwarded = forwarded;
+    
+    await report.save();
+    
+    res.status(200).json(report);
+  } catch (error) {
+    console.error("Error updating report flags:", error);
+    res.status(500).json({ message: 'Server error updating report flags' });
+  }
 };
