@@ -111,7 +111,7 @@ const AdminDashboard = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '1rem' }}>
         <div className="glass-panel animate-fade-in" style={{ maxWidth: '400px', width: '100%', padding: '3rem 2rem', borderRadius: '24px', textAlign: 'center' }}>
           <Shield size={48} className="text-primary" style={{ marginBottom: '1rem', color: 'var(--primary)' }} />
           <h2 style={{ marginBottom: '0.5rem' }}>Admin Access</h2>
