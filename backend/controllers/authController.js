@@ -18,9 +18,9 @@ const generateOTP = () => {
 exports.sendOtp = async (req, res) => {
   let { email } = req.body;
   
-  // Normalize email: trim whitespace and convert to lowercase
+  // Normalize email: Remove ALL whitespace (spaces, newlines, tabs) and convert to lowercase
   if (email) {
-    email = email.trim().toLowerCase();
+    email = email.replace(/\s+/g, '').toLowerCase();
   }
   
   console.log(`[Auth Attempt] Processing email: '${email}'`);
