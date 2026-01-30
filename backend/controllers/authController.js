@@ -46,7 +46,8 @@ exports.sendOtp = async (req, res) => {
     });
     
     if (!admin) {
-      console.log(`[Auth Failed] Email '${email}' not found in Admin whitelist.`);
+      const reqId = Math.random().toString(36).substring(7);
+      console.log(`[Auth Failed] Email '${email}' not found. ReqID: ${reqId}`);
       
       // Fallback: Check if trimming or case is weirdly broken by doing a LIKE search
       const looseMatch = await Admin.findOne({
@@ -64,7 +65,7 @@ exports.sendOtp = async (req, res) => {
           // We can't reassign 'const admin', so we need to handle this.
       } else {
         return res.status(403).json({ 
-            message: `Access Denied. The email '${email}' is not authorized for Admin access. Please contact the superadmin.` 
+            message: `Access Denied. The email '${email}' is not authorized. ReqID: ${reqId}` 
         });
       }
     }
