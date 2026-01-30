@@ -16,7 +16,12 @@ const generateOTP = () => {
 // @route   POST /api/auth/send-otp
 // @access  Public
 exports.sendOtp = async (req, res) => {
-  const { email } = req.body;
+  let { email } = req.body;
+  
+  // Normalize email: trim whitespace and convert to lowercase
+  if (email) {
+    email = email.trim().toLowerCase();
+  }
 
   if (!email || !email.endsWith('.edu.ng')) {
     return res.status(400).json({ message: 'Please provide a valid .edu.ng email address' });
