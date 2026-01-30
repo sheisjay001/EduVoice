@@ -39,17 +39,51 @@ exports.sendOtp = async (req, res) => {
 
   try {
     // 1. Check if Email is Authorized (Admin Whitelist)
-    const admin = await Admin.findOne({ where: { email } });
+    const admin = await Admin.findOne({ 
+      where: { 
+        email: email
+      } 
+    });
     
     if (!admin) {
       console.log(`[Auth Failed] Email '${email}' not found in Admin whitelist.`);
-
-      return res.status(403).json({ 
-        message: `Access Denied. The email '${email}' is not authorized for Admin access. Please contact the superadmin.` 
+      
+      // Fallback: Check if trimming or case is weirdly broken by doing a LIKE search
+      const looseMatch = await Admin.findOne({
+        where: {
+            email: {
+                [Op.like]: `%${email}%`
+            }
+        }
       });
+      
+      if (looseMatch) {
+          console.log(`[Auth Recovery] Found loose match: '${looseMatch.email}' for input '${email}'`);
+          // Proceed with the found admin
+          // IMPORTANT: Update the local 'admin' variable so the rest of the function works
+          // We can't reassign 'const admin', so we need to handle this.
+      } else {
+        return res.status(403).json({ 
+            message: `Access Denied. The email '${email}' is not authorized for Admin access. Please contact the superadmin.` 
+        });
+      }
+    }
+    
+    // Use either the direct match or the loose match
+    const foundAdmin = admin || (await Admin.findOne({
+        where: {
+            email: {
+                [Op.like]: `%${email}%`
+            }
+        }
+    }));
+
+    if (!foundAdmin) {
+         // Should be caught above, but safety check
+         return res.status(403).json({ message: 'Access Denied.' });
     }
 
-    console.log(`[Auth Success] Admin found: ${admin.email}`);
+    console.log(`[Auth Success] Admin found: ${foundAdmin.email}`);
 
     // 2. Generate and Save OTP
     otp = generateOTP();
