@@ -20,13 +20,14 @@ console.log(`- TIDB_DATABASE: ${mask(process.env.TIDB_DATABASE)}`);
 const DB_HOST = process.env.DB_HOST || process.env.TIDB_HOST;
 const DB_NAME = process.env.DB_NAME || process.env.TIDB_DATABASE;
 const DB_USER = process.env.DB_USER || process.env.TIDB_USER;
-const DB_PASS = process.env.DB_PASS || process.env.TIDB_PASSWORD;
+const DB_PASS = process.env.DB_PASS !== undefined ? process.env.DB_PASS : process.env.TIDB_PASSWORD;
 const DB_PORT = process.env.DB_PORT || process.env.TIDB_PORT || 3306;
 
 if (!DB_HOST) missingVars.push('DB_HOST or TIDB_HOST');
 if (!DB_NAME) missingVars.push('DB_NAME or TIDB_DATABASE');
 if (!DB_USER) missingVars.push('DB_USER or TIDB_USER');
-if (!DB_PASS) missingVars.push('DB_PASS or TIDB_PASSWORD');
+// Allow empty password (common in local XAMPP)
+if (DB_PASS === undefined) missingVars.push('DB_PASS or TIDB_PASSWORD');
 
 if (missingVars.length === 0) {
   try {
@@ -41,10 +42,12 @@ if (missingVars.length === 0) {
         dialectModule: mysql2, // Fix for Vercel/Webpack not bundling mysql2
         dialectOptions: {
           connectTimeout: 10000, // 10 seconds timeout
-          ssl: {
-            require: true,
-            rejectUnauthorized: false
-          }
+          ...(DB_HOST !== 'localhost' && DB_HOST !== '127.0.0.1' ? {
+            ssl: {
+              require: true,
+              rejectUnauthorized: false
+            }
+          } : {})
         },
         pool: {
           max: 5,
