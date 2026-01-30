@@ -4,13 +4,10 @@ import VerifyOtp from './components/VerifyOtp';
 import ReportPage from './components/ReportPage';
 import AdminDashboard from './components/AdminDashboard';
 import StatusTracker from './components/StatusTracker';
+import PanicButton from './components/PanicButton';
 import './App.css'
 
 function App() {
-  const handlePanic = () => {
-    window.location.href = "https://en.wikipedia.org/wiki/Special:Random";
-  };
-
   return (
     <Router>
       <Routes>
@@ -22,9 +19,7 @@ function App() {
       </Routes>
       
       {/* Panic Button available globally */}
-      <button className="panic-btn" onClick={handlePanic} title="Panic Button">
-        EXIT
-      </button>
+      <PanicButton />
     </Router>
   )
 }
