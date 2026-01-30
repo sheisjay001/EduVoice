@@ -35,6 +35,8 @@ exports.sendOtp = async (req, res) => {
       // ... existing mock check logic ...
   }
 
+  let otp;
+
   try {
     // 1. Check if Email is Authorized (Admin Whitelist)
     const admin = await Admin.findOne({ where: { email } });
@@ -49,7 +51,7 @@ exports.sendOtp = async (req, res) => {
     console.log(`[Auth Success] Admin found: ${admin.email}`);
 
     // 2. Generate and Save OTP
-    const otp = generateOTP();
+    otp = generateOTP();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
 
     let otpRecord = await Otp.findOne({ where: { email } });
