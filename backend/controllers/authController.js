@@ -43,8 +43,9 @@ exports.sendOtp = async (req, res) => {
     
     if (!admin) {
       console.log(`[Auth Failed] Email '${email}' not found in Admin whitelist.`);
+
       return res.status(403).json({ 
-        message: 'Access Denied. Your email is not authorized for Admin access.' 
+        message: `Access Denied. The email '${email}' is not authorized for Admin access. Please contact the superadmin.` 
       });
     }
 
