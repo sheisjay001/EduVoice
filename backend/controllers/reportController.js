@@ -10,6 +10,7 @@ const memoryReports = [];
 // @route   POST /api/reports
 // @access  Private
 exports.createReport = async (req, res) => {
+  console.log("🔍 [CreateReport] Request received.");
   const { 
     institution,
     faculty, 
@@ -30,6 +31,7 @@ exports.createReport = async (req, res) => {
   // If using real DB, try to save there
   if (!sequelize.isMock) {
     try {
+      console.log("🔍 [CreateReport] Attempting to save to DB...");
       const report = await Report.create({
         institution,
         faculty,
@@ -39,6 +41,7 @@ exports.createReport = async (req, res) => {
         encryptedDescription,
         evidence: evidenceFiles
       });
+      console.log("✅ [CreateReport] Saved to DB. CaseID:", report.caseId);
 
       return res.status(201).json({ 
         message: 'Report submitted successfully', 
@@ -49,7 +52,7 @@ exports.createReport = async (req, res) => {
       
       // Return detailed error if DB connection exists but query failed
       return res.status(500).json({ 
-        message: 'Database Error', 
+        message: 'Database Error: ' + error.message, 
         detail: error.message 
       });
     }
@@ -98,77 +101,70 @@ exports.getReports = async (req, res) => {
         
         // Only apply filter if the keyword is not generic (like 'gmail' or 'yahoo' - though auth requires .edu.ng)
         if (institutionKeyword && institutionKeyword.length > 2) {
-            whereClause = {
-                institution: {
-                    [Op.like]: `%${institutionKeyword}%`
-                }
-            };
+            whereClause.institution = { [Op.like]: `%${institutionKeyword}%` };
         }
     }
   }
 
   try {
-    // Sequelize: findAll with order and filtering
-    const reports = await Report.findAll({
-      where: whereClause,
-      order: [['createdAt', 'DESC']]
-    });
-    res.status(200).json(reports);
-  } catch (error) {
-    console.warn("⚠️ Database unavailable. Fetching from In-Memory Store.");
-    
-    // Filter memory reports if needed
-    let filteredReports = memoryReports;
-    if (adminEmail) {
-        const parts = adminEmail.split('@');
-        if (parts.length > 1) {
-            const institutionKeyword = parts[1].split('.')[0];
-            filteredReports = memoryReports.filter(r => 
-                r.institution && r.institution.toLowerCase().includes(institutionKeyword.toLowerCase())
-            );
+    if (!sequelize.isMock) {
+        const reports = await Report.findAll({ 
+            where: whereClause,
+            order: [['createdAt', 'DESC']] 
+        });
+        return res.json(reports);
+    } else {
+        // Filter memory reports
+        let filteredReports = memoryReports;
+        if (whereClause.institution) {
+             const keyword = whereClause.institution[Op.like].replace(/%/g, '');
+             filteredReports = memoryReports.filter(r => r.institution.toLowerCase().includes(keyword.toLowerCase()));
         }
+        return res.json(filteredReports.sort((a, b) => b.createdAt - a.createdAt));
     }
-    
-    res.status(200).json(filteredReports.sort((a, b) => b.createdAt - a.createdAt));
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    res.status(500).json({ message: 'Server error fetching reports' });
   }
 };
 
-// @desc    Check case status
+// @desc    Get report status
 // @route   GET /api/reports/:caseId/status
-// @access  Public
+// @access  Public (with Case ID)
 exports.getReportStatus = async (req, res) => {
-  let result = null;
+  const { caseId } = req.params;
 
   try {
-    const report = await Report.findOne({ 
-      where: { caseId: req.params.caseId },
-      attributes: ['status', 'viewed', 'forwarded'] // Return status and flags
-    });
+    if (!sequelize.isMock) {
+        const report = await Report.findOne({ 
+            where: { caseId },
+            attributes: ['status', 'updatedAt', 'viewed', 'forwarded']
+        });
 
-    if (report) {
-      result = {
-        status: report.status,
-        viewed: report.viewed,
-        forwarded: report.forwarded
-      };
+        if (!report) {
+            return res.status(404).json({ message: 'Report not found' });
+        }
+
+        return res.json({ 
+            status: report.status, 
+            updatedAt: report.updatedAt,
+            viewed: report.viewed,
+            forwarded: report.forwarded
+        });
+    } else {
+        const report = memoryReports.find(r => r.caseId === caseId);
+        if (!report) return res.status(404).json({ message: 'Report not found' });
+        return res.json({ 
+            status: report.status, 
+            updatedAt: report.createdAt, // Fallback
+            viewed: report.viewed || false,
+            forwarded: report.forwarded || false
+        });
     }
   } catch (error) {
-    console.warn("⚠️ Database unavailable. Checking In-Memory Store.");
-    const report = memoryReports.find(r => r.caseId === req.params.caseId);
-    if (report) {
-      result = {
-        status: report.status,
-        viewed: report.viewed || false,
-        forwarded: report.forwarded || false
-      };
-    }
+    console.error("Error fetching status:", error);
+    res.status(500).json({ message: 'Server error' });
   }
-
-  if (!result) {
-    return res.status(404).json({ message: 'Case ID not found' });
-  }
-
-  res.status(200).json(result);
 };
 
 // @desc    Update report flags (viewed, forwarded)

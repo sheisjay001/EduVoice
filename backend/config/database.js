@@ -1,6 +1,10 @@
 const { Sequelize } = require('sequelize');
 const mysql2 = require('mysql2'); // Explicit require to force bundling
-require('dotenv').config();
+const path = require('path');
+
+// Try loading .env from root (default) and backend/
+require('dotenv').config(); 
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 let sequelize;
 let isMock = false;
@@ -17,17 +21,14 @@ console.log(`- DB_NAME: ${mask(process.env.DB_NAME)}`);
 console.log(`- TIDB_DATABASE: ${mask(process.env.TIDB_DATABASE)}`);
 
 // Support both standard DB_ vars and Vercel/TiDB specific TIDB_ vars
-const DB_HOST = process.env.DB_HOST || process.env.TIDB_HOST;
-const DB_NAME = process.env.DB_NAME || process.env.TIDB_DATABASE;
-const DB_USER = process.env.DB_USER || process.env.TIDB_USER;
-const DB_PASS = process.env.DB_PASS !== undefined ? process.env.DB_PASS : process.env.TIDB_PASSWORD;
+// Default to XAMPP settings if missing (Localhost fallback)
+const DB_HOST = process.env.DB_HOST || process.env.TIDB_HOST || 'localhost';
+const DB_NAME = process.env.DB_NAME || process.env.TIDB_DATABASE || 'edu_voice';
+const DB_USER = process.env.DB_USER || process.env.TIDB_USER || 'root';
+const DB_PASS = process.env.DB_PASS !== undefined ? process.env.DB_PASS : (process.env.TIDB_PASSWORD !== undefined ? process.env.TIDB_PASSWORD : '');
 const DB_PORT = process.env.DB_PORT || process.env.TIDB_PORT || 3306;
 
-if (!DB_HOST) missingVars.push('DB_HOST or TIDB_HOST');
-if (!DB_NAME) missingVars.push('DB_NAME or TIDB_DATABASE');
-if (!DB_USER) missingVars.push('DB_USER or TIDB_USER');
-// Allow empty password (common in local XAMPP)
-if (DB_PASS === undefined) missingVars.push('DB_PASS or TIDB_PASSWORD');
+// No missing vars check needed as we have defaults
 
 if (missingVars.length === 0) {
   try {

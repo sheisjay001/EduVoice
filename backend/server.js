@@ -96,6 +96,7 @@ app.use((req, res) => {
 // Database Connection & Server Start
 const startServer = async () => {
   try {
+    console.log("🚀 [Server] V2 Starting...");
     // Authenticate with TiDB
     await sequelize.authenticate();
     console.log('TiDB/MySQL Connected Successfully.');
