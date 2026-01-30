@@ -12,7 +12,8 @@ const seedAdmins = async () => {
     const admins = [
       { email: 'president@futminna.edu.ng', institution: 'Federal University of Technology, Minna', role: 'admin' },
       { email: 'vc@unilag.edu.ng', institution: 'University of Lagos', role: 'admin' },
-      { email: 'admin@eduvoice.ng', institution: 'EduVoice HQ', role: 'superadmin' }
+      { email: 'admin@eduvoice.ng', institution: 'EduVoice HQ', role: 'superadmin' },
+      { email: 'joy.m2200251@st.futminna.edu.ng', institution: 'Federal University of Technology, Minna', role: 'admin' }
     ];
 
     for (const admin of admins) {
