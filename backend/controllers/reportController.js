@@ -32,6 +32,16 @@ exports.createReport = async (req, res) => {
   if (!sequelize.isMock) {
     try {
       console.log("🔍 [CreateReport] Attempting to save to DB...");
+      
+      // DEBUG: Check if column exists in DB
+      try {
+        const [cols] = await sequelize.query("SHOW COLUMNS FROM Reports LIKE 'viewed'");
+        console.log("🔍 [CreateReport] DB Column check (viewed):", cols);
+        console.log("🔍 [CreateReport] Model Attributes:", Object.keys(Report.rawAttributes));
+      } catch (err) {
+        console.error("⚠️ [CreateReport] Failed to check columns:", err.message);
+      }
+
       const report = await Report.create({
         institution,
         faculty,
