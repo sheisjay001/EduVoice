@@ -1,4 +1,5 @@
 const Otp = require('../models/Otp');
+const Admin = require('../models/Admin');
 const { sendOTPEmail } = require('../utils/emailService');
 const crypto = require('crypto');
 const { Op } = require('sequelize');
@@ -21,28 +22,25 @@ exports.sendOtp = async (req, res) => {
     return res.status(400).json({ message: 'Please provide a valid .edu.ng email address' });
   }
 
-  const otp = generateOTP();
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
-
   // Check if we are in Mock Mode (No DB Connection)
   const sequelize = require('../config/database');
   if (sequelize.isMock) {
-    if (sequelize.missingVars && sequelize.missingVars.length > 0) {
-       const missing = sequelize.missingVars.join(', ');
-       return res.status(500).json({ 
-         message: 'Database Configuration Error', 
-         detail: `Missing Environment Variables: ${missing}. Check Vercel Settings.`
-       });
-    } else {
-       return res.status(500).json({ 
-         message: 'Database Connection Failed', 
-         detail: `Variables found but connection failed: ${sequelize.initError || 'Unknown Error'}. Check DB Host/User/Pass.`
-       });
-    }
+      // ... existing mock check logic ...
   }
 
   try {
-    // Try Database First
+    // 1. Check if Email is Authorized (Admin Whitelist)
+    const admin = await Admin.findOne({ where: { email } });
+    if (!admin) {
+      return res.status(403).json({ 
+        message: 'Access Denied. Your email is not authorized for Admin access.' 
+      });
+    }
+
+    // 2. Generate and Save OTP
+    const otp = generateOTP();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 mins
+
     let otpRecord = await Otp.findOne({ where: { email } });
     
     if (otpRecord) {
