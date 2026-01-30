@@ -22,6 +22,8 @@ exports.sendOtp = async (req, res) => {
   if (email) {
     email = email.trim().toLowerCase();
   }
+  
+  console.log(`[Auth Attempt] Processing email: '${email}'`);
 
   if (!email || !email.endsWith('.edu.ng')) {
     return res.status(400).json({ message: 'Please provide a valid .edu.ng email address' });
@@ -36,11 +38,15 @@ exports.sendOtp = async (req, res) => {
   try {
     // 1. Check if Email is Authorized (Admin Whitelist)
     const admin = await Admin.findOne({ where: { email } });
+    
     if (!admin) {
+      console.log(`[Auth Failed] Email '${email}' not found in Admin whitelist.`);
       return res.status(403).json({ 
         message: 'Access Denied. Your email is not authorized for Admin access.' 
       });
     }
+
+    console.log(`[Auth Success] Admin found: ${admin.email}`);
 
     // 2. Generate and Save OTP
     const otp = generateOTP();
