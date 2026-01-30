@@ -7,6 +7,7 @@ import { PUBLIC_KEY } from '../constants/keys';
 
 const ReportPage = () => {
   const [formData, setFormData] = useState({
+    institution: '',
     faculty: '',
     department: '',
     courseCode: '',
@@ -155,6 +156,17 @@ const ReportPage = () => {
               </h3>
               
               <div className="grid-3" style={{ gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>University / Institution</label>
+                  <input
+                    type="text"
+                    name="institution"
+                    placeholder="e.g. FUTMINNA, UNILAG"
+                    value={formData.institution}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Faculty</label>
                   <input

@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Report = require('../models/Report');
 const crypto = require('crypto');
 const sequelize = require('../config/database'); // Import sequelize to check isMock
@@ -10,6 +11,7 @@ const memoryReports = [];
 // @access  Private
 exports.createReport = async (req, res) => {
   const { 
+    institution,
     faculty, 
     department, 
     courseCode, 
@@ -29,6 +31,7 @@ exports.createReport = async (req, res) => {
   if (!sequelize.isMock) {
     try {
       const report = await Report.create({
+        institution,
         faculty,
         department,
         courseCode,
@@ -58,6 +61,7 @@ exports.createReport = async (req, res) => {
   const newReport = {
     id: memoryReports.length + 1,
     caseId: crypto.randomBytes(4).toString('hex').toUpperCase(),
+    institution,
     faculty,
     department,
     courseCode,
@@ -80,15 +84,52 @@ exports.createReport = async (req, res) => {
 // @route   GET /api/reports
 // @access  Private (Admin only)
 exports.getReports = async (req, res) => {
+  const adminEmail = req.query.adminEmail || '';
+  let whereClause = {};
+
+  // Extract institution keyword from admin email (e.g., 'futminna' from 'admin@futminna.edu.ng')
+  if (adminEmail) {
+    const parts = adminEmail.split('@');
+    if (parts.length > 1) {
+        const domain = parts[1];
+        // Split domain by dot, usually first part is the institution (e.g., 'unilag' in 'unilag.edu.ng')
+        // But for 'student@futminna.edu.ng', it's 'futminna'.
+        const institutionKeyword = domain.split('.')[0];
+        
+        // Only apply filter if the keyword is not generic (like 'gmail' or 'yahoo' - though auth requires .edu.ng)
+        if (institutionKeyword && institutionKeyword.length > 2) {
+            whereClause = {
+                institution: {
+                    [Op.like]: `%${institutionKeyword}%`
+                }
+            };
+        }
+    }
+  }
+
   try {
-    // Sequelize: findAll with order
+    // Sequelize: findAll with order and filtering
     const reports = await Report.findAll({
+      where: whereClause,
       order: [['createdAt', 'DESC']]
     });
     res.status(200).json(reports);
   } catch (error) {
     console.warn("⚠️ Database unavailable. Fetching from In-Memory Store.");
-    res.status(200).json(memoryReports.sort((a, b) => b.createdAt - a.createdAt));
+    
+    // Filter memory reports if needed
+    let filteredReports = memoryReports;
+    if (adminEmail) {
+        const parts = adminEmail.split('@');
+        if (parts.length > 1) {
+            const institutionKeyword = parts[1].split('.')[0];
+            filteredReports = memoryReports.filter(r => 
+                r.institution && r.institution.toLowerCase().includes(institutionKeyword.toLowerCase())
+            );
+        }
+    }
+    
+    res.status(200).json(filteredReports.sort((a, b) => b.createdAt - a.createdAt));
   }
 };
 

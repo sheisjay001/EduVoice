@@ -9,6 +9,10 @@ const Report = sequelize.define('Report', {
     allowNull: false,
     defaultValue: () => crypto.randomBytes(4).toString('hex').toUpperCase()
   },
+  institution: {
+    type: DataTypes.STRING,
+    allowNull: true, // Allow null for backward compatibility
+  },
   faculty: {
     type: DataTypes.STRING,
     allowNull: true,

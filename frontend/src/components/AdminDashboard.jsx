@@ -17,9 +17,9 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-        fetchReports();
+        fetchReports(email);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, email]);
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -51,9 +51,11 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchReports = async () => {
+  const fetchReports = async (adminEmail) => {
     try {
-      const res = await axios.get('/api/reports');
+      const res = await axios.get('/api/reports', {
+        params: { adminEmail }
+      });
       if (Array.isArray(res.data)) {
         setReports(res.data);
       } else {
@@ -269,6 +271,10 @@ const AdminDashboard = () => {
                     {expandedReport === report.caseId && (
                     <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }} className="animate-fade-in">
                         <div className="grid-3" style={{ marginBottom: '1.5rem' }}>
+                        <div>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Institution</span>
+                            <div style={{ fontWeight: 500 }}>{report.institution || 'N/A'}</div>
+                        </div>
                         <div>
                             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Faculty</span>
                             <div style={{ fontWeight: 500 }}>{report.faculty}</div>

@@ -100,9 +100,9 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('TiDB/MySQL Connected Successfully.');
 
-    // Sync Models (Create tables if not exist)
-    await sequelize.sync();
-    console.log('Database Synced.');
+    // Sync Models (Create tables if not exist, alter if changed)
+    await sequelize.sync({ alter: true });
+    console.log('Database Synced (Alter Mode).');
   } catch (error) {
     console.error('Unable to connect to the database (Running in Offline Mode):', error.message);
   }
