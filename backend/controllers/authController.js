@@ -18,9 +18,9 @@ const generateOTP = () => {
 exports.sendOtp = async (req, res) => {
   let { email } = req.body;
   
-  // Normalize email: Remove ALL whitespace (spaces, newlines, tabs) and convert to lowercase
+  // Normalize email: Remove ALL non-standard characters (keep only letters, numbers, @, ., _, -)
   if (email) {
-    email = email.replace(/\s+/g, '').toLowerCase();
+    email = email.toLowerCase().replace(/[^a-z0-9@._-]/g, '');
   }
   
   console.log(`[Auth Attempt] Processing email: '${email}'`);
@@ -39,35 +39,37 @@ exports.sendOtp = async (req, res) => {
 
   try {
     // 1. Check if Email is Authorized (Admin Whitelist)
-    const admin = await Admin.findOne({ 
+    let admin = await Admin.findOne({ 
       where: { 
         email: email
       } 
     });
     
     if (!admin) {
-      const reqId = Math.random().toString(36).substring(7);
-      console.log(`[Auth Failed] Email '${email}' not found. ReqID: ${reqId}`);
-      
-      // Fallback: Check if trimming or case is weirdly broken by doing a LIKE search
-      const looseMatch = await Admin.findOne({
-        where: {
-            email: {
-                [Op.like]: `%${email}%`
-            }
+        // Emergency manual check - Bypass DB collation/query issues
+        const allAdmins = await Admin.findAll();
+        admin = allAdmins.find(a => a.email.trim().toLowerCase() === email.trim().toLowerCase());
+         
+        if (admin) {
+             console.log(`[Auth Recovery] Found admin via manual JS scan: ${admin.email}`);
         }
-      });
-      
-      if (looseMatch) {
-          console.log(`[Auth Recovery] Found loose match: '${looseMatch.email}' for input '${email}'`);
-          // Proceed with the found admin
-          // IMPORTANT: Update the local 'admin' variable so the rest of the function works
-          // We can't reassign 'const admin', so we need to handle this.
-      } else {
+    }
+
+    if (!admin) {
+        const reqId = Math.random().toString(36).substring(7);
+        
+        // Log details for debugging
+        const codes = [];
+        for (let i = 0; i < email.length; i++) {
+            codes.push(email.charCodeAt(i));
+        }
+        
+        console.log(`[Auth Failed] Email '${email}' not found. ReqID: ${reqId}`);
+        console.log(`[Auth Debug] Char codes: ${codes.join(',')}`);
+
         return res.status(403).json({ 
             message: `Access Denied. The email '${email}' is not authorized. ReqID: ${reqId}` 
         });
-      }
     }
     
     // Use either the direct match or the loose match
