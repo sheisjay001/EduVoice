@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Background: Circle with gradient -->
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="20" fill="url(#grad1)" />
+  
+  <!-- Icon: Speech Bubble -->
+  <path d="M20 30C20 24.4772 24.4772 20 30 20H70C75.5228 20 80 24.4772 80 30V60C80 65.5228 75.5228 70 70 70H40L25 80V70H20C14.4772 70 10 65.5228 10 60V30Z" fill="white" fill-opacity="0.9"/>
+  
+  <!-- Icon: Megaphone / Sound Wave inside -->
+  <path d="M35 45H65" stroke="#4F46E5" stroke-width="6" stroke-linecap="round"/>
+  <path d="M35 35H55" stroke="#4F46E5" stroke-width="6" stroke-linecap="round"/>
+  <path d="M35 55H60" stroke="#4F46E5" stroke-width="6" stroke-linecap="round"/>
+</svg>
