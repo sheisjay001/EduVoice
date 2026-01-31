@@ -98,32 +98,37 @@ exports.createReport = async (req, res) => {
 // @access  Private (Admin only)
 exports.getReports = async (req, res) => {
   const adminEmail = req.query.adminEmail || '';
-  let whereClause = {};
+        let whereClause = {};
 
-  // Extract institution keyword from admin email (e.g., 'futminna' from 'admin@futminna.edu.ng')
-  if (adminEmail) {
-    const parts = adminEmail.split('@');
-    if (parts.length > 1) {
-        const domain = parts[1];
-        // Split domain by dot, usually first part is the institution (e.g., 'unilag' in 'unilag.edu.ng')
-        // But for 'student@futminna.edu.ng', it's 'futminna'.
-        const institutionKeyword = domain.split('.')[0];
-        
-        // Only apply filter if the keyword is not generic (like 'gmail' or 'yahoo' - though auth requires .edu.ng)
-        if (institutionKeyword && institutionKeyword.length > 2) {
-            whereClause.institution = { [Op.like]: `%${institutionKeyword}%` };
+        // --- BYPASS FILTER FOR SUPER ADMIN (Debug) ---
+        // If the email is the specific demo admin, show ALL reports regardless of institution.
+        if (adminEmail === 'joy.m2200251@st.futminna.edu.ng') {
+            console.log(`[ReportController] Super Admin '${adminEmail}' detected. Showing ALL reports.`);
+            // No whereClause.institution filter applied.
+        } 
+        else if (adminEmail) {
+            // Normal Logic for other admins
+            const parts = adminEmail.split('@');
+            if (parts.length > 1) {
+                const domain = parts[1];
+                const institutionKeyword = domain.split('.')[0];
+                
+                if (institutionKeyword && institutionKeyword.length > 2) {
+                    whereClause.institution = { [Op.like]: `%${institutionKeyword}%` };
+                    console.log(`[ReportController] Filtering reports for admin '${adminEmail}' with keyword '${institutionKeyword}'`);
+                }
+            }
         }
-    }
-  }
 
-  try {
-    if (!sequelize.isMock) {
-        const reports = await Report.findAll({ 
-            where: whereClause,
-            order: [['createdAt', 'DESC']] 
-        });
-        return res.json(reports);
-    } else {
+        try {
+            if (!sequelize.isMock) {
+                const reports = await Report.findAll({ 
+                    where: whereClause,
+                    order: [['createdAt', 'DESC']] 
+                });
+                console.log(`[ReportController] Found ${reports.length} reports for ${adminEmail}`);
+                return res.json(reports);
+            } else {
         // Filter memory reports
         let filteredReports = memoryReports;
         if (whereClause.institution) {
@@ -146,20 +151,21 @@ exports.getReportStatus = async (req, res) => {
 
   try {
     if (!sequelize.isMock) {
+        // Only select available fields (avoiding 'viewed'/'forwarded' if they don't exist)
         const report = await Report.findOne({ 
             where: { caseId },
-            attributes: ['status', 'updatedAt', 'viewed', 'forwarded']
+            attributes: ['status', 'updatedAt'] // Removed 'viewed', 'forwarded' temporarily
         });
 
         if (!report) {
             return res.status(404).json({ message: 'Report not found' });
         }
 
-        return res.json({ 
-            status: report.status, 
+        res.json({
+            status: report.status,
             updatedAt: report.updatedAt,
-            viewed: report.viewed,
-            forwarded: report.forwarded
+            // viewed: report.viewed, // Disabled
+            // forwarded: report.forwarded // Disabled
         });
     } else {
         const report = memoryReports.find(r => r.caseId === caseId);
