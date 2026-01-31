@@ -106,24 +106,7 @@ const startServer = async () => {
     console.log('Database Synced (Alter Mode).');
 
     // FORCE CHECK COLUMNS (Fix for persistent "Unknown column" error)
-    try {
-      const [results] = await sequelize.query("SHOW COLUMNS FROM Reports");
-      const columns = results.map(c => c.Field);
-      console.log("🔍 [Server] Verified Reports Table Columns:", columns);
-
-      if (!columns.includes('viewed')) {
-        console.warn("⚠️ [Server] 'viewed' column missing! Adding manually...");
-        await sequelize.query("ALTER TABLE Reports ADD COLUMN viewed TINYINT(1) DEFAULT 0");
-        console.log("✅ [Server] 'viewed' column added.");
-      }
-      if (!columns.includes('forwarded')) {
-        console.warn("⚠️ [Server] 'forwarded' column missing! Adding manually...");
-        await sequelize.query("ALTER TABLE Reports ADD COLUMN forwarded TINYINT(1) DEFAULT 0");
-        console.log("✅ [Server] 'forwarded' column added.");
-      }
-    } catch (err) {
-      console.error("❌ [Server] Failed to verify columns manually:", err);
-    }
+    await checkAndFixColumns();
 
   } catch (error) {
     console.error('Unable to connect to the database (Running in Offline Mode):', error.message);
@@ -136,6 +119,44 @@ const startServer = async () => {
     console.log(`DB Host: ${process.env.DB_HOST}`);
   });
 };
+
+// --- Helper Function to Check and Fix Columns ---
+async function checkAndFixColumns() {
+  try {
+    const [results] = await sequelize.query("SHOW COLUMNS FROM Reports");
+    const columns = results.map(c => c.Field);
+    console.log("🔍 [Server] Verified Reports Table Columns:", columns);
+
+    const missingCols = [];
+    if (!columns.includes('viewed')) missingCols.push('viewed');
+    if (!columns.includes('forwarded')) missingCols.push('forwarded');
+
+    if (missingCols.length > 0) {
+      console.warn(`⚠️ [Server] Missing columns found: ${missingCols.join(', ')}. Adding manually...`);
+      for (const col of missingCols) {
+         await sequelize.query(`ALTER TABLE Reports ADD COLUMN ${col} TINYINT(1) DEFAULT 0`);
+         console.log(`✅ [Server] '${col}' column added.`);
+      }
+      return { status: 'fixed', added: missingCols };
+    } else {
+      console.log("✅ [Server] All required columns exist.");
+      return { status: 'ok', message: 'All columns exist' };
+    }
+  } catch (err) {
+    console.error("❌ [Server] Failed to verify columns manually:", err);
+    throw err;
+  }
+}
+
+// --- Debug Endpoint to Trigger Fix Manually ---
+app.get('/api/fix-db-columns', async (req, res) => {
+  try {
+    const result = await checkAndFixColumns();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Only start server if run directly (Local Development)
 if (require.main === module) {
