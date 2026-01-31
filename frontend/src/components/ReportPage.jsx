@@ -158,10 +158,13 @@ const ReportPage = () => {
               <div className="grid-3" style={{ gap: '1rem' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>University / Institution</label>
+                  <p style={{ fontSize: '0.8rem', color: '#f59e0b', marginBottom: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', padding: '0.5rem', borderRadius: '4px' }}>
+                    <strong>IMPORTANT:</strong> Please type the <strong>FULL NAME</strong> of your school. Do NOT use abbreviations.
+                  </p>
                   <input
                     type="text"
                     name="institution"
-                    placeholder="e.g. FUTMINNA, UNILAG"
+                    placeholder="e.g. Federal University of Technology Minna"
                     value={formData.institution}
                     onChange={handleChange}
                     required
