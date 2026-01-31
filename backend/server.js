@@ -162,6 +162,21 @@ app.get('/api/fix-db-columns', async (req, res) => {
   }
 });
 
+// --- Debug Endpoint to Fetch Report by ID (Bypass Filters) ---
+app.get('/api/debug/report/:caseId', async (req, res) => {
+  try {
+    const { caseId } = req.params;
+    const [results] = await sequelize.query(`SELECT * FROM Reports WHERE caseId = '${caseId}'`);
+    if (results.length > 0) {
+      res.json(results[0]);
+    } else {
+      res.status(404).json({ message: 'Report not found in DB' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Only start server if run directly (Local Development)
 if (require.main === module) {
   startServer();
