@@ -56,7 +56,7 @@ if (missingVars.length === 0) {
           acquire: 10000, // Fail after 10 seconds of trying to get connection
           idle: 5000
         },
-        logging: console.log, // Enable logging to see connection errors
+        logging: (msg) => console.log(`[Sequelize] ${msg}`), // Enhanced logging
       }
     );
   } catch (err) {

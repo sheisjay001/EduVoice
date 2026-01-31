@@ -104,6 +104,27 @@ const startServer = async () => {
     // Sync Models (Create tables if not exist, alter if changed)
     await sequelize.sync({ alter: true });
     console.log('Database Synced (Alter Mode).');
+
+    // FORCE CHECK COLUMNS (Fix for persistent "Unknown column" error)
+    try {
+      const [results] = await sequelize.query("SHOW COLUMNS FROM Reports");
+      const columns = results.map(c => c.Field);
+      console.log("🔍 [Server] Verified Reports Table Columns:", columns);
+
+      if (!columns.includes('viewed')) {
+        console.warn("⚠️ [Server] 'viewed' column missing! Adding manually...");
+        await sequelize.query("ALTER TABLE Reports ADD COLUMN viewed TINYINT(1) DEFAULT 0");
+        console.log("✅ [Server] 'viewed' column added.");
+      }
+      if (!columns.includes('forwarded')) {
+        console.warn("⚠️ [Server] 'forwarded' column missing! Adding manually...");
+        await sequelize.query("ALTER TABLE Reports ADD COLUMN forwarded TINYINT(1) DEFAULT 0");
+        console.log("✅ [Server] 'forwarded' column added.");
+      }
+    } catch (err) {
+      console.error("❌ [Server] Failed to verify columns manually:", err);
+    }
+
   } catch (error) {
     console.error('Unable to connect to the database (Running in Offline Mode):', error.message);
   }
