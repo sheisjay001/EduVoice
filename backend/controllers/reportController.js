@@ -169,7 +169,7 @@ exports.getReportStatus = async (req, res) => {
         // Only select available fields (avoiding 'viewed'/'forwarded' if they don't exist)
         const report = await Report.findOne({ 
             where: { caseId },
-            attributes: ['status', 'updatedAt'] // Removed 'viewed', 'forwarded' temporarily
+            attributes: ['status', 'updatedAt', 'viewed', 'forwarded']
         });
 
         if (!report) {
@@ -179,8 +179,8 @@ exports.getReportStatus = async (req, res) => {
         res.json({
             status: report.status,
             updatedAt: report.updatedAt,
-            // viewed: report.viewed, // Disabled
-            // forwarded: report.forwarded // Disabled
+            viewed: report.viewed,
+            forwarded: report.forwarded
         });
     } else {
         const report = memoryReports.find(r => r.caseId === caseId);

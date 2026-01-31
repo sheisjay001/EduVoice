@@ -48,7 +48,7 @@ const initDB = async () => {
     console.log('Database Synced (Alter Mode via Middleware).');
     
     // FORCE CHECK COLUMNS (Critical for Vercel/Serverless environments)
-    // await checkAndFixColumns(); // DISABLED TEMPORARILY
+    await checkAndFixColumns(); 
     
     dbInitialized = true;
   } catch (error) {
