@@ -46,6 +46,10 @@ const initDB = async () => {
     console.log('TiDB/MySQL Connected Successfully.');
     await sequelize.sync({ alter: true });
     console.log('Database Synced (Alter Mode via Middleware).');
+    
+    // FORCE CHECK COLUMNS (Critical for Vercel/Serverless environments)
+    await checkAndFixColumns();
+    
     dbInitialized = true;
   } catch (error) {
     console.error('DB Init Failed (Offline Mode):', error.message);
