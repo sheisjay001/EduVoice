@@ -23,7 +23,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter); // Apply to all API routes
 
 // Body Parser with limits (Buffer Overflow Protection)
-app.use(express.json({ limit: '10kb' })); 
+app.use(express.json({ limit: '10mb' })); 
 
 // Data Sanitization against XSS
 app.use(xss());
@@ -44,8 +44,8 @@ const initDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('TiDB/MySQL Connected Successfully.');
-    await sequelize.sync();
-    console.log('Database Synced.');
+    await sequelize.sync({ alter: true });
+    console.log('Database Synced (Alter Mode via Middleware).');
     dbInitialized = true;
   } catch (error) {
     console.error('DB Init Failed (Offline Mode):', error.message);
