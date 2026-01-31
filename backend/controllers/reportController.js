@@ -102,13 +102,11 @@ exports.getReports = async (req, res) => {
 
         // --- BYPASS FILTER FOR SUPER ADMIN (Debug) ---
         // If the email is the specific demo admin, show ALL reports regardless of institution.
-        /* 
         if (adminEmail === 'joy.m2200251@st.futminna.edu.ng') {
             console.log(`[ReportController] Super Admin '${adminEmail}' detected. Showing ALL reports.`);
             // No whereClause.institution filter applied.
         } 
-        else */ 
-        if (adminEmail) {
+        else if (adminEmail) {
             // Normal Logic for other admins
             const parts = adminEmail.split('@');
             if (parts.length > 1) {
