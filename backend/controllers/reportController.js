@@ -115,16 +115,18 @@ exports.getReports = async (req, res) => {
                 const domain = parts[1]; // e.g., 'st.futminna.edu.ng' or 'futminna.edu.ng'
                 
                 // Check if domain contains 'futminna' (handles 'st.futminna.edu.ng', 'futminna.edu.ng')
-                if (domain.toLowerCase().includes('futminna')) {
-                     console.log(`[ReportController] FUT Minna admin detected: ${adminEmail}`);
-                     whereClause.institution = {
-                        [Op.or]: [
-                            { [Op.like]: '%futminna%' }, // Covers 'futminna', 'FUTMINNA', 'FUTminna'
-                            { [Op.like]: '%FUT minna%' },
-                            { [Op.like]: '%Federal University Of Technology Minna%' }
-                        ]
-                     };
-                } else {
+                 if (domain.toLowerCase().includes('futminna')) {
+                      console.log(`[ReportController] FUT Minna admin detected: ${adminEmail}`);
+                      whereClause.institution = {
+                         [Op.or]: [
+                             { [Op.like]: '%futminna%' }, 
+                             { [Op.like]: '%FUTMINNA%' },
+                             { [Op.like]: '%FUTminna%' },
+                             { [Op.like]: '%FUT minna%' },
+                             { [Op.like]: '%Federal University Of Technology Minna%' }
+                         ]
+                      };
+                 } else {
                     // Default logic for other institutions
                     const institutionKeyword = domain.split('.')[0];
                     if (institutionKeyword && institutionKeyword.length > 2) {
