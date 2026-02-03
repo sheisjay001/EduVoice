@@ -170,7 +170,7 @@ exports.getReportStatus = async (req, res) => {
         // Only select available fields (avoiding 'viewed'/'forwarded' if they don't exist)
         const report = await Report.findOne({ 
             where: { caseId },
-            attributes: ['status', 'updatedAt', 'viewed', 'forwarded']
+            attributes: ['status', 'updatedAt'] // REMOVED viewed, forwarded temporarily
         });
 
         if (!report) {
@@ -180,8 +180,8 @@ exports.getReportStatus = async (req, res) => {
         res.json({
             status: report.status,
             updatedAt: report.updatedAt,
-            viewed: report.viewed,
-            forwarded: report.forwarded
+            viewed: false, // Default to false
+            forwarded: false // Default to false
         });
     } else {
         const report = memoryReports.find(r => r.caseId === caseId);
@@ -220,8 +220,8 @@ exports.updateReportFlags = async (req, res) => {
         return res.status(404).json({ message: 'Report not found' });
     }
 
-    if (viewed !== undefined) report.viewed = viewed;
-    if (forwarded !== undefined) report.forwarded = forwarded;
+    // if (viewed !== undefined) report.viewed = viewed; // DISABLED
+    // if (forwarded !== undefined) report.forwarded = forwarded; // DISABLED
     
     await report.save();
     
