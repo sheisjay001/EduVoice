@@ -66,7 +66,8 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error("Failed to fetch reports:", error);
-      alert("Failed to fetch reports. Check console for details.");
+      const errorMsg = error.response?.data?.message || error.message || "Unknown error";
+      alert(`Failed to fetch reports: ${errorMsg}`);
     } finally {
       setLoading(false);
     }
