@@ -52,10 +52,13 @@ const AdminDashboard = () => {
   };
 
   const fetchReports = async (adminEmail) => {
+    setLoading(true);
     try {
+      console.log(`Fetching reports for: ${adminEmail}`);
       const res = await axios.get('/api/reports', {
         params: { adminEmail }
       });
+      console.log("Reports fetched:", res.data);
       if (Array.isArray(res.data)) {
         setReports(res.data);
       } else {
@@ -63,6 +66,9 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error("Failed to fetch reports:", error);
+      alert("Failed to fetch reports. Check console for details.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -198,10 +204,18 @@ const AdminDashboard = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Shield size={32} className="text-primary" />
           <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
+          <span style={{ fontSize: '0.8rem', background: 'var(--bg-card)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+             {reports.length} Reports Found
+          </span>
         </div>
-        <button onClick={() => setIsAuthenticated(false)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)' }}>
-          Logout
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button onClick={() => fetchReports(email)} className="secondary-btn" disabled={loading}>
+            {loading ? 'Refreshing...' : 'Refresh'}
+          </button>
+          <button onClick={() => setIsAuthenticated(false)} className="secondary-btn">
+            Logout
+          </button>
+        </div>
       </header>
 
       <div className="container">
