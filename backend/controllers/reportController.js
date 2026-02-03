@@ -136,6 +136,7 @@ exports.getReports = async (req, res) => {
         }
 
         try {
+            console.log(`[ReportController] Querying DB with whereClause:`, JSON.stringify(whereClause, null, 2));
             if (!sequelize.isMock) {
                 const reports = await Report.findAll({ 
                     where: whereClause,
@@ -153,8 +154,8 @@ exports.getReports = async (req, res) => {
         return res.json(filteredReports.sort((a, b) => b.createdAt - a.createdAt));
     }
   } catch (error) {
-    console.error("Error fetching reports:", error);
-    res.status(500).json({ message: 'Server error fetching reports' });
+    console.error("❌ Error fetching reports (Stack):", error);
+    res.status(500).json({ message: 'Server error fetching reports', error: error.message });
   }
 };
 
