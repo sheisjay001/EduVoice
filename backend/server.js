@@ -48,7 +48,7 @@ const initDB = async () => {
     console.log('Database Synced (Alter Mode via Middleware).');
     
     // FORCE CHECK COLUMNS (Critical for Vercel/Serverless environments)
-    await checkAndFixColumns(); 
+    // await checkAndFixColumns(); 
     
     dbInitialized = true;
   } catch (error) {
@@ -135,7 +135,7 @@ const startServer = async () => {
     console.log('Database Synced (Alter Mode).');
 
     // FORCE CHECK COLUMNS (Fix for persistent "Unknown column" error)
-    await checkAndFixColumns(); 
+    // await checkAndFixColumns(); // DISABLED TEMPORARILY
 
   } catch (error) {
     console.error('Unable to connect to the database (Running in Offline Mode):', error.message);
