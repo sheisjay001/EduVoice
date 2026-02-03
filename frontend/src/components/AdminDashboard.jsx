@@ -66,8 +66,9 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error("Failed to fetch reports:", error);
-      const errorMsg = error.response?.data?.message || error.message || "Unknown error";
-      alert(`Failed to fetch reports: ${errorMsg}`);
+      const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || "Unknown error";
+      const errorStack = error.response?.data?.detail || "No stack trace"; // Backend might send detailed stack
+      alert(`Failed to fetch reports: ${errorMsg}\nDetails: ${errorStack}`);
     } finally {
       setLoading(false);
     }
