@@ -135,7 +135,7 @@ const startServer = async () => {
     console.log('Database Synced (Alter Mode).');
 
     // FORCE CHECK COLUMNS (Fix for persistent "Unknown column" error)
-    // await checkAndFixColumns(); // DISABLED TEMPORARILY
+    await checkAndFixColumns(); 
 
   } catch (error) {
     console.error('Unable to connect to the database (Running in Offline Mode):', error.message);
