@@ -250,3 +250,30 @@ exports.updateReportStatus = async (req, res) => {
     res.status(500).json({ message: 'Server error updating report status' });
   }
 };
+
+// @desc    Delete all reports (For Admin Reset)
+// @route   DELETE /api/reports/all
+// @access  Private (Admin only)
+exports.deleteAllReports = async (req, res) => {
+  const { adminEmail } = req.query;
+
+  // Only allow Super Admin to delete all reports
+  if (adminEmail !== 'joy.m2200251@st.futminna.edu.ng') {
+    return res.status(403).json({ message: 'Unauthorized. Only super admin can reset reports.' });
+  }
+
+  try {
+    if (!sequelize.isMock) {
+        await Report.destroy({ where: {}, truncate: false }); // destroy all rows
+        // Note: some DBs don't allow TRUNCATE via sequelize destroy, so we use empty where
+        console.log(`✅ [ReportController] All reports deleted by ${adminEmail}`);
+        res.status(200).json({ message: 'All reports have been deleted successfully.' });
+    } else {
+        memoryReports.length = 0; // Clear memory array
+        res.status(200).json({ message: 'All reports have been deleted (Mock Mode).' });
+    }
+  } catch (error) {
+    console.error("Error deleting reports:", error);
+    res.status(500).json({ message: 'Server error deleting reports' });
+  }
+};

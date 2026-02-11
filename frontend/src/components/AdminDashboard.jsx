@@ -133,6 +133,26 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleClearAllReports = async () => {
+    if (!window.confirm("Are you sure you want to DELETE ALL reports? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await axios.delete('/api/reports/all', {
+        params: { adminEmail: email }
+      });
+      alert(res.data.message);
+      setReports([]); // Clear local state
+    } catch (error) {
+      console.error("Failed to clear reports:", error);
+      alert(error.response?.data?.message || "Failed to clear reports");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '1rem' }}>
@@ -210,11 +230,29 @@ const AdminDashboard = () => {
                {reports.length} Reports
             </span>
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            {email === 'joy.m2200251@st.futminna.edu.ng' && (
+              <button 
+                onClick={handleClearAllReports}
+                className="secondary-btn"
+                style={{ 
+                  padding: '0.5rem 1rem', 
+                  fontSize: '0.875rem', 
+                  borderColor: 'rgba(239, 68, 68, 0.5)', 
+                  color: '#ef4444',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                <AlertCircle size={16} />
+                Clear All Reports
+              </button>
+            )}
             <button onClick={() => fetchReports(email)} className="secondary-btn" disabled={loading} style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
               {loading ? '...' : 'Refresh'}
             </button>
-            <button onClick={() => setIsAuthenticated(false)} className="secondary-btn" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+            <button onClick={() => { setIsAuthenticated(false); setStep('email'); }} className="secondary-btn" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
               Logout
             </button>
           </div>
