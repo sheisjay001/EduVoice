@@ -64,6 +64,8 @@ const initDB = async () => {
         // Sequelize should have created it, but if not, something is wrong
     } else {
         console.log("✅ [DB Init] Reports table verified.");
+        // PROACTIVELY FIX COLUMNS (Handles cases where sync {alter:true} fails silently)
+        await checkAndFixColumns();
     }
     
     dbInitialized = true;
@@ -169,12 +171,33 @@ const startServer = async () => {
 async function checkAndFixColumns() {
   try {
     const [results] = await sequelize.query("SHOW COLUMNS FROM Reports");
-    const columns = results.map(c => c.Field);
-    console.log("🔍 [Server] Verified Reports Table Columns:", columns);
+    const existingColumns = results.map(c => c.Field);
+    console.log("🔍 [Server] Current Reports Table Columns:", existingColumns);
 
-    return { status: 'ok', message: 'All columns exist' };
+    const requiredColumns = [
+      { name: 'institution', type: 'VARCHAR(255) NULL' },
+      { name: 'faculty', type: 'VARCHAR(255) NULL' },
+      { name: 'department', type: 'VARCHAR(255) NULL' },
+      { name: 'courseCode', type: 'VARCHAR(255) NULL' },
+      { name: 'evidence', type: 'JSON NULL' },
+      { name: 'status', type: "ENUM('Pending', 'Investigating', 'Resolved', 'Dismissed') DEFAULT 'Pending'" }
+    ];
+
+    for (const col of requiredColumns) {
+      if (!existingColumns.includes(col.name)) {
+        console.log(`🛠️ [Server] Adding missing column: ${col.name}`);
+        try {
+          await sequelize.query(`ALTER TABLE Reports ADD COLUMN ${col.name} ${col.type}`);
+          console.log(`✅ [Server] Column ${col.name} added successfully.`);
+        } catch (colErr) {
+          console.error(`❌ [Server] Failed to add column ${col.name}:`, colErr.message);
+        }
+      }
+    }
+
+    return { status: 'ok', message: 'Columns checked and fixed' };
   } catch (err) {
-    console.error("❌ [Server] Failed to verify columns manually:", err);
+    console.error("❌ [Server] Failed to verify/fix columns manually:", err);
     throw err;
   }
 }
