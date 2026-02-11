@@ -57,31 +57,31 @@ const StatusTracker = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ padding: '2rem' }}>
+    <div className="min-h-screen" style={{ padding: 'min(2rem, 4vw)' }}>
       <button 
         onClick={() => navigate('/')} 
-        style={{ background: 'transparent', padding: 0, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}
+        style={{ background: 'transparent', padding: 0, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}
       >
         <ArrowLeft size={20} /> Back to Home
       </button>
 
-      <div className="container" style={{ textAlign: 'center', maxWidth: '600px', marginTop: '4rem' }}>
-        <h1 style={{ marginBottom: '1rem' }}>Track Case Status</h1>
-        <p style={{ marginBottom: '3rem' }}>Enter your Case ID to check the progress of your report.</p>
+      <div className="container" style={{ textAlign: 'center', maxWidth: '600px', marginTop: '2rem' }}>
+        <h1 style={{ marginBottom: '1rem', fontSize: 'clamp(1.75rem, 6vw, 2.5rem)' }}>Track Case Status</h1>
+        <p style={{ marginBottom: '2.5rem' }}>Enter your Case ID to check the progress of your report.</p>
         
-        <div className="card" style={{ padding: '3rem 2rem' }}>
+        <div className="card" style={{ padding: 'min(3rem, 6vw) min(2rem, 4vw)' }}>
           <form onSubmit={handleCheckStatus} style={{ marginBottom: '2rem' }}>
             <div style={{ position: 'relative', maxWidth: '400px', margin: '0 auto' }}>
               <input 
                 type="text" 
-                placeholder="CASE ID (e.g. 8A2F1C)" 
+                placeholder="CASE ID" 
                 value={caseId}
                 onChange={(e) => setCaseId(e.target.value.toUpperCase())}
                 required
                 style={{ 
                   textAlign: 'center', 
-                  fontSize: '1.5rem', 
-                  letterSpacing: '3px',
+                  fontSize: 'clamp(1.1rem, 5vw, 1.5rem)', 
+                  letterSpacing: 'min(3px, 1vw)',
                   textTransform: 'uppercase',
                   padding: '1rem',
                   borderRadius: '12px',
@@ -90,7 +90,7 @@ const StatusTracker = () => {
                 }}
               />
             </div>
-            <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '1.5rem', minWidth: '200px' }}>
+            <button type="submit" className="primary-btn" disabled={loading} style={{ marginTop: '1.5rem', width: '100%', maxWidth: '300px' }}>
               {loading ? 'Searching Database...' : 'Track Case'}
             </button>
           </form>

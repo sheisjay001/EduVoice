@@ -200,136 +200,144 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ padding: '2rem' }}>
-      <header className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Shield size={32} className="text-primary" />
-          <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
-          <span style={{ fontSize: '0.8rem', background: 'var(--bg-card)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
-             {reports.length} Reports Found
-          </span>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button onClick={() => fetchReports(email)} className="secondary-btn" disabled={loading}>
-            {loading ? 'Refreshing...' : 'Refresh'}
-          </button>
-          <button onClick={() => setIsAuthenticated(false)} className="secondary-btn">
-            Logout
-          </button>
+    <div className="min-h-screen" style={{ padding: 'min(2rem, 4vw)' }}>
+      <header className="container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Shield size={32} className="text-primary" />
+            <h2 style={{ margin: 0, fontSize: 'clamp(1.25rem, 5vw, 1.75rem)' }}>Admin Dashboard</h2>
+            <span style={{ fontSize: '0.75rem', background: 'var(--bg-card)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+               {reports.length} Reports
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button onClick={() => fetchReports(email)} className="secondary-btn" disabled={loading} style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+              {loading ? '...' : 'Refresh'}
+            </button>
+            <button onClick={() => setIsAuthenticated(false)} className="secondary-btn" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="container">
+      <div className="container" style={{ padding: 0 }}>
         {/* Key Management Section */}
-        <div className="card" style={{ marginBottom: '2rem', border: '1px solid var(--border)' }}>
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-            <Key size={20} /> Decryption Key
+        <div className="card" style={{ marginBottom: '1.5rem', padding: '1.25rem', border: '1px solid var(--border)' }}>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', marginBottom: '0.75rem' }}>
+            <Key size={18} /> Decryption Key
           </h3>
-          <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>Paste your RSA Private Key here to unlock report contents.</p>
+          <p style={{ fontSize: '0.8rem', marginBottom: '0.75rem' }}>Paste your Private Key to unlock report contents.</p>
           <textarea
-            placeholder="-----BEGIN RSA PRIVATE KEY----- ..."
+            placeholder="-----BEGIN RSA PRIVATE KEY-----"
             value={privateKeyPem}
             onChange={(e) => setPrivateKeyPem(e.target.value)}
-            rows={3}
-            style={{ fontFamily: 'monospace', fontSize: '0.8rem', background: 'var(--bg-dark)' }}
+            rows={2}
+            style={{ fontFamily: 'monospace', fontSize: '0.75rem', background: 'var(--bg-dark)', marginBottom: 0 }}
           />
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
           <button 
             onClick={() => setActiveTab('list')}
             style={{ 
               background: activeTab === 'list' ? 'var(--primary)' : 'transparent',
               color: activeTab === 'list' ? 'white' : 'var(--text-muted)',
-              border: activeTab === 'list' ? 'none' : '1px solid var(--border)'
+              border: activeTab === 'list' ? 'none' : '1px solid var(--border)',
+              padding: '0.5rem 1rem',
+              fontSize: '0.875rem',
+              whiteSpace: 'nowrap'
             }}
           >
-            <LayoutList size={18} /> Reports
+            <LayoutList size={16} /> Reports
           </button>
           <button 
             onClick={() => setActiveTab('heatmap')}
             style={{ 
               background: activeTab === 'heatmap' ? 'var(--primary)' : 'transparent',
               color: activeTab === 'heatmap' ? 'white' : 'var(--text-muted)',
-              border: activeTab === 'heatmap' ? 'none' : '1px solid var(--border)'
+              border: activeTab === 'heatmap' ? 'none' : '1px solid var(--border)',
+              padding: '0.5rem 1rem',
+              fontSize: '0.875rem',
+              whiteSpace: 'nowrap'
             }}
           >
-            <Map size={18} /> Heat Map
+            <Map size={16} /> Heat Map
           </button>
         </div>
 
         {activeTab === 'list' ? (
           <div style={{ display: 'grid', gap: '1rem' }}>
             {reports.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '4rem', opacity: 0.5 }}>
-                    <FileText size={48} style={{ marginBottom: '1rem' }} />
+                <div style={{ textAlign: 'center', padding: '3rem 1rem', opacity: 0.5 }}>
+                    <FileText size={40} style={{ marginBottom: '1rem' }} />
                     <p>No reports found in the system.</p>
                 </div>
             ) : (
                 reports.map((report) => (
-                <div key={report.caseId} className="card" style={{ padding: '1.5rem', transition: 'all 0.2s' }}>
+                <div key={report.caseId} className="card" style={{ padding: '1.25rem', transition: 'all 0.2s' }}>
                     <div 
-                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                    style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', gap: '1rem' }}
                     onClick={() => setExpandedReport(expandedReport === report.caseId ? null : report.caseId)}
                     >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <div style={{ 
-                        width: '40px', height: '40px', borderRadius: '50%', 
+                        width: '36px', height: '36px', borderRadius: '50%', 
                         background: 'rgba(99, 102, 241, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'var(--primary)', fontWeight: 'bold'
+                        color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.8rem'
                         }}>
                         {report.caseId.slice(0, 2)}
                         </div>
                         <div>
-                        <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Case #{report.caseId}</div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            {new Date(report.createdAt).toLocaleDateString()} at {new Date(report.createdAt).toLocaleTimeString()}
+                        <div style={{ fontWeight: 'bold', fontSize: '1rem' }}>Case #{report.caseId}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            {new Date(report.createdAt).toLocaleDateString()}
                         </div>
                         </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: '1', justifyContent: 'flex-end' }}>
                         <span style={{ 
-                        padding: '0.25rem 0.75rem', borderRadius: '99px', fontSize: '0.85rem', fontWeight: 600,
+                        padding: '0.2rem 0.6rem', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600,
                         background: report.status === 'Resolved' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
                         color: report.status === 'Resolved' ? 'var(--success)' : '#f59e0b'
                         }}>
                         {report.status}
                         </span>
-                        {expandedReport === report.caseId ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        {expandedReport === report.caseId ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                     </div>
                     </div>
 
                     {expandedReport === report.caseId && (
-                    <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }} className="animate-fade-in">
-                        <div className="grid-3" style={{ marginBottom: '1.5rem' }}>
+                    <div style={{ marginTop: '1.25rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }} className="animate-fade-in">
+                        <div className="grid-3" style={{ marginBottom: '1.25rem', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                         <div>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Institution</span>
-                            <div style={{ fontWeight: 500 }}>{report.institution || 'N/A'}</div>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Institution</span>
+                            <div style={{ fontWeight: 500, fontSize: '0.85rem' }}>{report.institution || 'N/A'}</div>
                         </div>
                         <div>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Faculty</span>
-                            <div style={{ fontWeight: 500 }}>{report.faculty}</div>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Faculty</span>
+                            <div style={{ fontWeight: 500, fontSize: '0.85rem' }}>{report.faculty}</div>
                         </div>
                         <div>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Department</span>
-                            <div style={{ fontWeight: 500 }}>{report.department}</div>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Department</span>
+                            <div style={{ fontWeight: 500, fontSize: '0.85rem' }}>{report.department}</div>
                         </div>
                         <div>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Course Code</span>
-                            <div style={{ fontWeight: 500 }}>{report.courseCode || 'N/A'}</div>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Course Code</span>
+                            <div style={{ fontWeight: 500, fontSize: '0.85rem' }}>{report.courseCode || 'N/A'}</div>
                         </div>
                         </div>
 
-                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                            <h4 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <Unlock size={18} /> Encrypted Content
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '12px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '1rem', marginBottom: '1rem' }}>
+                            <h4 style={{ margin: 0, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Unlock size={16} /> Encrypted Content
                             </h4>
                             {!decryptedReports[report._id] && (
                             <button 
                                 onClick={() => decryptReport(report._id, report.encryptedDescription)}
-                                style={{ padding: '0.25rem 0.75rem', fontSize: '0.8rem', marginTop: 0 }}
+                                style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem', marginTop: 0 }}
                             >
                                 Decrypt Now
                             </button>
@@ -338,31 +346,22 @@ const AdminDashboard = () => {
 
                         {decryptedReports[report._id] ? (
                             <div className="animate-fade-in">
-                            <div style={{ marginBottom: '1rem' }}>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Offender Name</span>
-                                <div style={{ fontWeight: 600, fontSize: '1.1rem', color: 'var(--danger)' }}>
-                                {decryptedReports[report._id] ? "Decrypted (See logic)" : "..."} 
-                                {/* Note: In a real app we'd decrypt offenderName separately, but for MVP re-using logic */}
-                                {/** Actually, we need to decrypt offenderName separately. Let's fix that logic inline or simplify **/}
-                                </div>
-                            </div>
                             <div>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Description</span>
-                                <p style={{ color: 'var(--text-light)' }}>{decryptedReports[report._id]}</p>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Description</span>
+                                <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', lineHeight: '1.5' }}>{decryptedReports[report._id]}</p>
                             </div>
                             </div>
                         ) : (
-                            <div style={{ filter: 'blur(4px)', userSelect: 'none', opacity: 0.5 }}>
+                            <div style={{ filter: 'blur(4px)', userSelect: 'none', opacity: 0.5, fontSize: '0.85rem' }}>
                             <p>Lrem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
                             </div>
                         )}
                         </div>
                         
                         {/* Evidence */}
                          {safelyParseEvidence(report.evidence).length > 0 && (
-                            <div style={{ marginTop: '1.5rem' }}>
-                                <h4>Evidence Files</h4>
+                            <div style={{ marginTop: '1.25rem' }}>
+                                <h4 style={{ fontSize: '0.9rem', marginBottom: '0.75rem' }}>Evidence Files</h4>
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                     {safelyParseEvidence(report.evidence).map((file, idx) => (
                                         <a 
@@ -372,12 +371,12 @@ const AdminDashboard = () => {
                                             rel="noopener noreferrer"
                                             style={{ 
                                                 display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                                padding: '0.5rem 1rem', background: 'var(--bg-dark)', 
+                                                padding: '0.4rem 0.75rem', background: 'var(--bg-dark)', 
                                                 borderRadius: '8px', textDecoration: 'none', color: 'var(--primary)',
-                                                border: '1px solid var(--border)'
+                                                border: '1px solid var(--border)', fontSize: '0.8rem'
                                             }}
                                         >
-                                            <FileText size={16} /> Evidence {idx + 1}
+                                            <FileText size={14} /> Evidence {idx + 1}
                                         </a>
                                     ))}
                                 </div>
@@ -385,22 +384,24 @@ const AdminDashboard = () => {
                          )}
 
                         {/* Status Controls */}
-                        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Update Status:</span>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Update Status:</span>
+                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                                 {['Pending', 'Investigating', 'Resolved', 'Dismissed'].map((status) => (
                                     <button 
                                         key={status}
                                         onClick={() => updateReportStatus(report.caseId, status)}
                                         style={{ 
-                                            padding: '0.4rem 0.8rem',
+                                            padding: '0.35rem 0.6rem',
                                             borderRadius: '6px',
-                                            fontSize: '0.8rem',
+                                            fontSize: '0.75rem',
                                             border: '1px solid var(--border)',
                                             background: report.status === status ? 'var(--primary)' : 'transparent',
                                             color: report.status === status ? 'white' : 'var(--text-muted)',
                                             cursor: 'pointer',
-                                            transition: 'all 0.2s'
+                                            transition: 'all 0.2s',
+                                            flex: '1',
+                                            minWidth: '80px'
                                         }}
                                     >
                                         {status}

@@ -50,28 +50,25 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <header className="container animate-fade-in" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{ marginBottom: '1.5rem' }}>
+      <header className="container animate-fade-in" style={{ textAlign: 'center' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
+          <h1 style={{ marginBottom: '1.5rem', wordBreak: 'break-word' }}>
             Speak Up. Stay Safe.<br />
             <span className="text-gradient">Totally Anonymous.</span>
           </h1>
-          <p style={{ fontSize: '1.25rem', maxWidth: '600px', margin: '0 auto 3rem auto' }}>
+          <p style={{ fontSize: 'clamp(1rem, 4vw, 1.25rem)', maxWidth: '600px', margin: '0 auto 3rem auto' }}>
             The decentralized whistleblower platform for Nigerian tertiary institutions. 
             Report incidents without revealing your identity.
           </p>
         </div>
 
         {/* Action Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: '2rem', 
+        <div className="grid-3" style={{ 
           maxWidth: '900px', 
           margin: '0 auto' 
         }}>
           {/* Verify Card */}
-          <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '24px' }}>
+          <div className="glass-panel" style={{ padding: 'min(2.5rem, 5vw)', borderRadius: '24px' }}>
             <h3 style={{ marginBottom: '0.5rem' }}>Verify Your Student Status</h3>
             <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
               We use a "Stateless OTP" to verify you belong to an institution without linking the report to your ID.
@@ -92,7 +89,7 @@ const LandingPage = () => {
               </div>
               
               {error && (
-                <div className="error" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div className="error" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textAlign: 'left' }}>
                   <span style={{ fontSize: '1.2rem' }}>•</span> {error}
                 </div>
               )}
@@ -105,7 +102,7 @@ const LandingPage = () => {
           </div>
 
           {/* Status Tracker Card */}
-          <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div className="glass-panel" style={{ padding: 'min(2.5rem, 5vw)', borderRadius: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <h3 style={{ marginBottom: '0.5rem' }}>Track Report Status</h3>
             <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
               Already submitted a report? Use your Case ID to check the investigation status anonymously.

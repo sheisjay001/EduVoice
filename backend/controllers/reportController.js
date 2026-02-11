@@ -136,18 +136,42 @@ exports.getReports = async (req, res) => {
                 console.log(`[ReportController] Found ${reports.length} reports for ${adminEmail}`);
                 return res.json(reports);
             } else {
-        // Filter memory reports
-        let filteredReports = memoryReports;
-        if (whereClause.institution) {
-             const keyword = whereClause.institution[Op.like].replace(/%/g, '');
-             filteredReports = memoryReports.filter(r => r.institution.toLowerCase().includes(keyword.toLowerCase()));
+                console.warn("⚠️ [ReportController] Running in MOCK mode.");
+                // Filter memory reports
+                let filteredReports = memoryReports;
+                if (whereClause.institution) {
+                    try {
+                        let keyword = "";
+                        if (typeof whereClause.institution === 'string') {
+                            keyword = whereClause.institution;
+                        } else if (whereClause.institution[Op.like]) {
+                            keyword = whereClause.institution[Op.like].replace(/%/g, '');
+                        } else if (whereClause.institution[Op.or]) {
+                            // If it's an OR array, just use the first keyword for mock filtering
+                            const firstOr = whereClause.institution[Op.or][0];
+                            keyword = firstOr[Op.like] ? firstOr[Op.like].replace(/%/g, '') : "";
+                        }
+                        
+                        if (keyword) {
+                            filteredReports = memoryReports.filter(r => 
+                                r.institution && r.institution.toLowerCase().includes(keyword.toLowerCase())
+                            );
+                        }
+                    } catch (filterError) {
+                        console.error("Error filtering mock reports:", filterError);
+                        // Fallback to all reports if filtering fails in mock mode
+                    }
+                }
+                return res.json(filteredReports.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
+            }
+        } catch (error) {
+            console.error("❌ Error fetching reports (Stack):", error);
+            res.status(500).json({ 
+                message: 'Server error fetching reports', 
+                error: error.message,
+                detail: error.stack // Added stack trace for easier debugging
+            });
         }
-        return res.json(filteredReports.sort((a, b) => b.createdAt - a.createdAt));
-    }
-  } catch (error) {
-    console.error("❌ Error fetching reports (Stack):", error);
-    res.status(500).json({ message: 'Server error fetching reports', error: error.message });
-  }
 };
 
 // @desc    Get report status

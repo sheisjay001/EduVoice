@@ -143,19 +143,19 @@ const ReportPage = () => {
 
       <div className="container animate-fade-in" style={{ padding: '2rem 1rem' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
             <h2>Submit a Report</h2>
-            <p>Fill out the details below. Sensitive information is encrypted on your device.</p>
+            <p style={{ fontSize: '0.9rem' }}>Fill out the details below. Sensitive information is encrypted on your device.</p>
           </div>
 
           <form onSubmit={handleSubmit}>
             {/* Context Section */}
-            <div className="card" style={{ marginBottom: '2rem' }}>
+            <div className="card" style={{ marginBottom: '1.5rem', padding: 'min(2rem, 4vw)' }}>
               <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <FileText size={20} /> Incident Context
               </h3>
               
-              <div className="grid-3" style={{ gap: '1rem' }}>
+              <div className="grid-3" style={{ gap: '1rem', gridTemplateColumns: '1fr' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>University / Institution</label>
                   <p style={{ fontSize: '0.8rem', color: '#f59e0b', marginBottom: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', padding: '0.5rem', borderRadius: '4px' }}>
@@ -170,27 +170,29 @@ const ReportPage = () => {
                     required
                   />
                 </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Faculty</label>
-                  <input
-                    type="text"
-                    name="faculty"
-                    placeholder="e.g. Science"
-                    value={formData.faculty}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Department</label>
-                  <input
-                    type="text"
-                    name="department"
-                    placeholder="e.g. Computer Science"
-                    value={formData.department}
-                    onChange={handleChange}
-                    required
-                  />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Faculty</label>
+                    <input
+                      type="text"
+                      name="faculty"
+                      placeholder="e.g. Science"
+                      value={formData.faculty}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Department</label>
+                    <input
+                      type="text"
+                      name="department"
+                      placeholder="e.g. Computer Science"
+                      value={formData.department}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
                 </div>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Course Code (Optional)</label>
@@ -206,13 +208,13 @@ const ReportPage = () => {
             </div>
 
             {/* Encrypted Section */}
-            <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', border: '1px solid rgba(99, 102, 241, 0.3)', marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div className="glass-panel" style={{ padding: 'min(2rem, 4vw)', borderRadius: '16px', border: '1px solid rgba(99, 102, 241, 0.3)', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                 <h3 style={{ fontSize: '1.25rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Lock size={20} style={{ color: 'var(--primary)' }} /> 
                   Encrypted Details
                 </h3>
-                <span style={{ fontSize: '0.8rem', padding: '0.25rem 0.75rem', background: 'rgba(99, 102, 241, 0.2)', color: 'var(--primary)', borderRadius: '99px' }}>
+                <span style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem', background: 'rgba(99, 102, 241, 0.2)', color: 'var(--primary)', borderRadius: '99px' }}>
                   End-to-End Encrypted
                 </span>
               </div>

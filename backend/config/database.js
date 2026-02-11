@@ -71,8 +71,11 @@ if (missingVars.length === 0) {
           name,
           schema,
           findOne: async () => null,
-          create: async () => ({}),
+          findAll: async () => [],
+          create: async (data) => ({ ...data, caseId: 'MOCK-' + Math.random().toString(36).substr(2, 9) }),
           save: async () => {},
+          update: async () => [0],
+          destroy: async () => 0,
         };
       }
     };
@@ -89,8 +92,11 @@ if (missingVars.length === 0) {
         name,
         schema,
         findOne: async () => null,
-        create: async () => ({}),
+        findAll: async () => [],
+        create: async (data) => ({ ...data, caseId: 'MOCK-' + Math.random().toString(36).substr(2, 9) }),
         save: async () => {},
+        update: async () => [0],
+        destroy: async () => 0,
       };
     }
   };

@@ -12,6 +12,11 @@ const VerifyOtp = () => {
   
   const email = location.state?.email;
 
+  // Helper for responsive icon sizes
+  const clampSize = (min, max) => {
+    return window.innerWidth < 768 ? min : max;
+  };
+
   // Redirect if no email provided
   if (!email) {
     navigate('/');
@@ -36,21 +41,21 @@ const VerifyOtp = () => {
 
   return (
     <div className="min-h-screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-      <div className="glass-panel animate-fade-in" style={{ maxWidth: '450px', width: '100%', padding: '3rem 2rem', borderRadius: '24px', textAlign: 'center' }}>
+      <div className="glass-panel animate-fade-in" style={{ maxWidth: '450px', width: '100%', padding: 'min(3rem, 8vw) min(2rem, 5vw)', borderRadius: '24px', textAlign: 'center' }}>
         
-        <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}>
-          <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '1.5rem', borderRadius: '50%' }}>
-            <Lock size={48} className="text-primary" style={{ color: 'var(--primary)' }} />
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '1.25rem', borderRadius: '50%' }}>
+            <Lock size={clampSize(32, 48)} className="text-primary" style={{ color: 'var(--primary)' }} />
           </div>
         </div>
 
-        <h2 style={{ marginBottom: '0.5rem' }}>Enter Verification Code</h2>
-        <p style={{ fontSize: '0.95rem' }}>
+        <h2 style={{ marginBottom: '0.5rem', fontSize: 'clamp(1.25rem, 5vw, 1.75rem)' }}>Enter Verification Code</h2>
+        <p style={{ fontSize: '0.9rem' }}>
           We've sent a 6-digit code to <br/>
-          <span style={{ color: 'var(--text-light)', fontWeight: 500 }}>{email}</span>
+          <span style={{ color: 'var(--text-light)', fontWeight: 500, wordBreak: 'break-all' }}>{email}</span>
         </p>
 
-        <form onSubmit={handleVerify} style={{ marginTop: '2rem' }}>
+        <form onSubmit={handleVerify} style={{ marginTop: '1.5rem' }}>
           <input
             type="text"
             placeholder="000000"
@@ -59,13 +64,13 @@ const VerifyOtp = () => {
             maxLength="6"
             style={{ 
               textAlign: 'center', 
-              fontSize: '2rem', 
-              letterSpacing: '0.5rem', 
+              fontSize: 'clamp(1.5rem, 8vw, 2rem)', 
+              letterSpacing: 'clamp(0.2rem, 4vw, 0.5rem)', 
               fontWeight: 700,
-              padding: '1rem',
+              padding: '0.875rem',
               background: 'rgba(15, 23, 42, 0.8)',
               borderColor: 'var(--border)',
-              marginBottom: '1.5rem'
+              marginBottom: '1rem'
             }}
             required
             autoFocus
