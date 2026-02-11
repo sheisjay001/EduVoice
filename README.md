@@ -50,6 +50,7 @@ All sensitive data (Perpetrator Name, Evidence, Description) is encrypted using 
 
 ### 🛡️ For Administration (The Ethics Committee) 
 * **Secure Access:** Login requires a verified `.edu.ng` email + OTP (No passwords). 
+* **Institutional Isolation (Multi-Tenancy):** Admins are strictly restricted to viewing reports from their own institution only. The system automatically filters data based on the institutional domain attached to the admin's verified email (e.g., an admin from `futminna.edu.ng` cannot access reports from `unilag.edu.ng`).
 * **Decryption Portal:** Secure, local-only interface to decrypt reports using the private key.
 * **Immutable Audit Trail:** Admins cannot delete reports. This ensures every report is preserved for accountability, even after being marked as **"Resolved"** or **"Dismissed"**.
 * **Self-Healing Infrastructure:** The system automatically validates and repairs its own database schema on startup, ensuring critical reporting columns (Institution, Faculty, etc.) are always present.
