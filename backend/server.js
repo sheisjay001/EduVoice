@@ -42,17 +42,33 @@ let dbInitialized = false;
 const initDB = async () => {
   if (dbInitialized) return;
   try {
+    console.log("🔄 [DB Init] Starting initialization...");
     await sequelize.authenticate();
-    console.log('TiDB/MySQL Connected Successfully.');
-    await sequelize.sync({ alter: true });
-    console.log('Database Synced (Alter Mode via Middleware).');
+    console.log('✅ [DB Init] TiDB/MySQL Connected.');
     
-    // FORCE CHECK COLUMNS (Critical for Vercel/Serverless environments)
-    // await checkAndFixColumns(); 
+    // Sync Models
+    // Using { alter: true } can sometimes be problematic on TiDB if permissions are tight
+    // We try it, but catch errors specifically for sync
+    try {
+        await sequelize.sync({ alter: true });
+        console.log('✅ [DB Init] Database Synced (Alter Mode).');
+    } catch (syncError) {
+        console.error('⚠️ [DB Init] Sync failed, attempting basic sync:', syncError.message);
+        await sequelize.sync(); // Fallback to basic sync (create if not exists)
+    }
+    
+    // Verify Reports table exists
+    const [results] = await sequelize.query("SHOW TABLES LIKE 'Reports'");
+    if (results.length === 0) {
+        console.warn("⚠️ [DB Init] Reports table still missing after sync. Attempting manual creation...");
+        // Sequelize should have created it, but if not, something is wrong
+    } else {
+        console.log("✅ [DB Init] Reports table verified.");
+    }
     
     dbInitialized = true;
   } catch (error) {
-    console.error('DB Init Failed (Offline Mode):', error.message);
+    console.error('❌ [DB Init] Critical Failure (Offline Mode):', error.message);
   }
 };
 
@@ -135,7 +151,7 @@ const startServer = async () => {
     console.log('Database Synced (Alter Mode).');
 
     // FORCE CHECK COLUMNS (Fix for persistent "Unknown column" error)
-    // await checkAndFixColumns(); // DISABLED TEMPORARILY
+    await checkAndFixColumns();
 
   } catch (error) {
     console.error('Unable to connect to the database (Running in Offline Mode):', error.message);

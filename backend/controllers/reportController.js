@@ -165,11 +165,16 @@ exports.getReports = async (req, res) => {
                 return res.json(filteredReports.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
             }
         } catch (error) {
-            console.error("❌ Error fetching reports (Stack):", error);
+            console.error("❌ Error fetching reports (Detailed):", error);
+            
+            // Extract the most useful error message
+            const dbError = error.original?.message || error.message || "Unknown Database Error";
+            const sqlQuery = error.original?.sql || "N/A";
+
             res.status(500).json({ 
-                message: 'Server error fetching reports', 
-                error: error.message,
-                detail: error.stack // Added stack trace for easier debugging
+                message: `Server error fetching reports: ${dbError}`, 
+                error: dbError,
+                detail: `SQL: ${sqlQuery}\n\nWhere: ${JSON.stringify(whereClause)}\n\nStack: ${error.stack}`
             });
         }
 };
