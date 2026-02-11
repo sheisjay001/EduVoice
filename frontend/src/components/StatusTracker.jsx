@@ -120,32 +120,15 @@ const StatusTracker = () => {
 
                 {/* Tracking Steps */}
                 <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {/* Viewed Step */}
                     <div style={{ 
                         display: 'flex', alignItems: 'center', gap: '1rem', 
-                        padding: '1rem', background: 'var(--bg-dark)', borderRadius: '12px',
-                        opacity: reportData.viewed ? 1 : 0.5
+                        padding: '1rem', background: 'var(--bg-dark)', borderRadius: '12px'
                     }}>
-                        {reportData.viewed ? <CheckCircle color="var(--success)" /> : <div style={{width: 24, height: 24, border: '2px solid var(--text-muted)', borderRadius: '50%'}} />}
+                        <Clock color="var(--primary)" />
                         <div style={{ textAlign: 'left' }}>
-                            <div style={{ fontWeight: 'bold' }}>Viewed by Admin</div>
+                            <div style={{ fontWeight: 'bold' }}>Last Updated</div>
                             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                {reportData.viewed ? 'Your report has been opened and reviewed.' : 'Pending review.'}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Forwarded Step */}
-                    <div style={{ 
-                        display: 'flex', alignItems: 'center', gap: '1rem', 
-                        padding: '1rem', background: 'var(--bg-dark)', borderRadius: '12px',
-                        opacity: reportData.forwarded ? 1 : 0.5
-                    }}>
-                        {reportData.forwarded ? <CheckCircle color="var(--primary)" /> : <div style={{width: 24, height: 24, border: '2px solid var(--text-muted)', borderRadius: '50%'}} />}
-                        <div style={{ textAlign: 'left' }}>
-                            <div style={{ fontWeight: 'bold' }}>Forwarded to Authorities</div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                {reportData.forwarded ? 'Escalated to appropriate university body.' : 'Not yet escalated.'}
+                                {new Date(reportData.updatedAt).toLocaleDateString()} at {new Date(reportData.updatedAt).toLocaleTimeString()}
                             </div>
                         </div>
                     </div>

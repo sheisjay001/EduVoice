@@ -24,12 +24,6 @@ async function check() {
     const columnNames = columns.map(c => c.Field);
     console.log('📋 Columns:', columnNames);
 
-    if (columnNames.includes('viewed')) {
-        console.log('✅ Column "viewed" FOUND in raw SQL check.');
-    } else {
-        console.error('❌ Column "viewed" NOT FOUND in raw SQL check.');
-    }
-
     await connection.end();
   } catch (err) {
     console.error('❌ Error:', err);

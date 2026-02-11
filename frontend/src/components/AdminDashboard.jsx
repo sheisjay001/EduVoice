@@ -117,20 +117,19 @@ const AdminDashboard = () => {
     }
   };
 
-  const toggleReportFlag = async (caseId, flag, currentValue) => {
+  const updateReportStatus = async (caseId, newStatus) => {
     try {
-      const updateData = { [flag]: !currentValue };
-      await axios.patch(`/api/reports/${caseId}/flags`, updateData);
+      await axios.patch(`/api/reports/${caseId}/status`, { status: newStatus });
       
       // Update local state
       setReports(prevReports => 
         prevReports.map(r => 
-          r.caseId === caseId ? { ...r, [flag]: !currentValue } : r
+          r.caseId === caseId ? { ...r, status: newStatus } : r
         )
       );
     } catch (error) {
-      console.error(`Failed to update ${flag}:`, error);
-      alert(`Failed to update ${flag} status`);
+      console.error(`Failed to update status:`, error);
+      alert(`Failed to update status`);
     }
   };
 
@@ -386,34 +385,28 @@ const AdminDashboard = () => {
                          )}
 
                         {/* Status Controls */}
-                        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                            <button 
-                                onClick={() => toggleReportFlag(report.caseId, 'viewed', report.viewed)}
-                                style={{ 
-                                    background: report.viewed ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-                                    border: report.viewed ? '1px solid var(--success)' : '1px solid var(--text-muted)',
-                                    color: report.viewed ? 'var(--success)' : 'var(--text-muted)',
-                                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                    padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s'
-                                }}
-                            >
-                                {report.viewed ? <CheckCircle size={18} /> : <div style={{width: 18, height: 18, border: '2px solid currentColor', borderRadius: '50%'}} />}
-                                {report.viewed ? 'Marked as Viewed' : 'Mark as Viewed'}
-                            </button>
-
-                            <button 
-                                onClick={() => toggleReportFlag(report.caseId, 'forwarded', report.forwarded)}
-                                style={{ 
-                                    background: report.forwarded ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
-                                    border: report.forwarded ? '1px solid var(--primary)' : '1px solid var(--text-muted)',
-                                    color: report.forwarded ? 'var(--primary)' : 'var(--text-muted)',
-                                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                    padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s'
-                                }}
-                            >
-                                {report.forwarded ? <CheckCircle size={18} /> : <div style={{width: 18, height: 18, border: '2px solid currentColor', borderRadius: '50%'}} />}
-                                {report.forwarded ? 'Forwarded to Authorities' : 'Mark as Forwarded'}
-                            </button>
+                        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Update Status:</span>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                {['Pending', 'Investigating', 'Resolved', 'Dismissed'].map((status) => (
+                                    <button 
+                                        key={status}
+                                        onClick={() => updateReportStatus(report.caseId, status)}
+                                        style={{ 
+                                            padding: '0.4rem 0.8rem',
+                                            borderRadius: '6px',
+                                            fontSize: '0.8rem',
+                                            border: '1px solid var(--border)',
+                                            background: report.status === status ? 'var(--primary)' : 'transparent',
+                                            color: report.status === status ? 'white' : 'var(--text-muted)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        {status}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                     )}

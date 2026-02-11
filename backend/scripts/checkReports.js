@@ -13,7 +13,7 @@ async function checkReports() {
         if (results.length > 0) {
             console.log('--- First 3 Reports ---');
             results.slice(0, 3).forEach(r => {
-                console.log(`ID: ${r.id}, CaseID: ${r.caseId}, Inst: ${r.institution}, Created: ${r.createdAt}, Viewed: ${r.viewed}`);
+                console.log(`ID: ${r.id}, CaseID: ${r.caseId}, Inst: ${r.institution}, Created: ${r.createdAt}`);
             });
         }
 

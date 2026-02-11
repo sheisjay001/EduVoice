@@ -40,15 +40,7 @@ const Report = sequelize.define('Report', {
   status: {
     type: DataTypes.ENUM('Pending', 'Investigating', 'Resolved', 'Dismissed'),
     defaultValue: 'Pending',
-  },
-  // viewed: {
-  //   type: DataTypes.BOOLEAN,
-  //   defaultValue: false
-  // },
-  // forwarded: {
-  //   type: DataTypes.BOOLEAN,
-  //   defaultValue: false
-  // }
+  }
 });
 
 module.exports = Report;

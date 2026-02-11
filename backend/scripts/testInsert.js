@@ -19,15 +19,10 @@ async function testInsert() {
       courseCode: 'TST101',
       encryptedOffender: 'test_offender',
       encryptedDescription: 'test_desc',
-      evidence: [],
-      // explicitly passing viewed/forwarded to see if it breaks
-      viewed: false,
-      forwarded: false
+      evidence: []
     });
 
     console.log("🎉 Success! Report created with ID:", report.caseId);
-    console.log("Viewed:", report.viewed);
-    console.log("Forwarded:", report.forwarded);
 
     // Clean up
     await report.destroy();

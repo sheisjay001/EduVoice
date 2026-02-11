@@ -33,15 +33,6 @@ exports.createReport = async (req, res) => {
     try {
       console.log("🔍 [CreateReport] Attempting to save to DB...");
       
-      // DEBUG: Check if column exists in DB
-      try {
-        const [cols] = await sequelize.query("SHOW COLUMNS FROM Reports LIKE 'viewed'");
-        console.log("🔍 [CreateReport] DB Column check (viewed):", cols);
-        console.log("🔍 [CreateReport] Model Attributes:", Object.keys(Report.rawAttributes));
-      } catch (err) {
-        console.error("⚠️ [CreateReport] Failed to check columns:", err.message);
-      }
-
       const report = await Report.create({
         institution,
         faculty,
@@ -167,10 +158,9 @@ exports.getReportStatus = async (req, res) => {
 
   try {
     if (!sequelize.isMock) {
-        // Only select available fields (avoiding 'viewed'/'forwarded' if they don't exist)
         const report = await Report.findOne({ 
             where: { caseId },
-            attributes: ['status', 'updatedAt'] // REMOVED viewed, forwarded temporarily
+            attributes: ['status', 'updatedAt']
         });
 
         if (!report) {
@@ -179,18 +169,14 @@ exports.getReportStatus = async (req, res) => {
 
         res.json({
             status: report.status,
-            updatedAt: report.updatedAt,
-            viewed: false, // Default to false
-            forwarded: false // Default to false
+            updatedAt: report.updatedAt
         });
     } else {
         const report = memoryReports.find(r => r.caseId === caseId);
         if (!report) return res.status(404).json({ message: 'Report not found' });
         return res.json({ 
             status: report.status, 
-            updatedAt: report.createdAt, // Fallback
-            viewed: report.viewed || false,
-            forwarded: report.forwarded || false
+            updatedAt: report.createdAt
         });
     }
   } catch (error) {
@@ -199,35 +185,39 @@ exports.getReportStatus = async (req, res) => {
   }
 };
 
-// @desc    Update report flags (viewed, forwarded)
-// @route   PATCH /api/reports/:caseId/flags
+// @desc    Update report status
+// @route   PATCH /api/reports/:caseId/status
 // @access  Private (Admin only)
-exports.updateReportFlags = async (req, res) => {
-  const { viewed, forwarded } = req.body;
+exports.updateReportStatus = async (req, res) => {
+  const { status } = req.body;
   const { caseId } = req.params;
 
-  try {
-    const report = await Report.findOne({ where: { caseId } });
+  if (!status) {
+    return res.status(400).json({ message: 'Status is required' });
+  }
 
-    if (!report) {
-        // Check memory store fallback
+  try {
+    if (!sequelize.isMock) {
+        const report = await Report.findOne({ where: { caseId } });
+
+        if (!report) {
+            return res.status(404).json({ message: 'Report not found' });
+        }
+
+        report.status = status;
+        await report.save();
+        
+        res.status(200).json(report);
+    } else {
         const memReport = memoryReports.find(r => r.caseId === caseId);
         if (memReport) {
-            if (viewed !== undefined) memReport.viewed = viewed;
-            if (forwarded !== undefined) memReport.forwarded = forwarded;
+            memReport.status = status;
             return res.status(200).json(memReport);
         }
         return res.status(404).json({ message: 'Report not found' });
     }
-
-    // if (viewed !== undefined) report.viewed = viewed; // DISABLED
-    // if (forwarded !== undefined) report.forwarded = forwarded; // DISABLED
-    
-    await report.save();
-    
-    res.status(200).json(report);
   } catch (error) {
-    console.error("Error updating report flags:", error);
-    res.status(500).json({ message: 'Server error updating report flags' });
+    console.error("Error updating report status:", error);
+    res.status(500).json({ message: 'Server error updating report status' });
   }
 };
