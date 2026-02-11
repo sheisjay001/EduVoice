@@ -51,7 +51,7 @@ All sensitive data (Perpetrator Name, Evidence, Description) is encrypted using 
 ### 🛡️ For Administration (The Ethics Committee) 
 * **Secure Access:** Login requires a verified `.edu.ng` email + OTP (No passwords). 
 * **Decryption Portal:** Secure, local-only interface to decrypt reports using the private key.
-* **Auto-Cleanup Integrity:** To prevent data hoarding and protect anonymity, reports are automatically and permanently deleted from the database as soon as they are marked as **"Resolved"** or **"Dismissed"**.
+* **Read-Only Integrity:** To preserve a permanent audit trail, reports cannot be deleted by admins; they can only update the case status (e.g., "Investigating", "Resolved").
 * **Safety Heat-Maps:** Visual analytics showing high-risk zones (e.g., *"80% of bullying reports are from Hostel C"*). 
 
 ### 🔐 Enterprise-Grade Security (New!)

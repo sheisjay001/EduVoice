@@ -119,19 +119,14 @@ const AdminDashboard = () => {
 
   const updateReportStatus = async (caseId, newStatus) => {
     try {
-      const response = await axios.patch(`/api/reports/${caseId}/status`, { status: newStatus });
+      await axios.patch(`/api/reports/${caseId}/status`, { status: newStatus });
       
-      // If the backend deleted the report (returned a specific message or we check status)
-      if (newStatus === 'Resolved' || newStatus === 'Dismissed') {
-        setReports(prevReports => prevReports.filter(r => r.caseId !== caseId));
-      } else {
-        // Update local state for other statuses
-        setReports(prevReports => 
-          prevReports.map(r => 
-            r.caseId === caseId ? { ...r, status: newStatus } : r
-          )
-        );
-      }
+      // Update local state for all statuses
+      setReports(prevReports => 
+        prevReports.map(r => 
+          r.caseId === caseId ? { ...r, status: newStatus } : r
+        )
+      );
     } catch (error) {
       console.error(`Failed to update status:`, error);
       alert(`Failed to update status`);

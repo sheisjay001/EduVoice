@@ -233,26 +233,15 @@ exports.updateReportStatus = async (req, res) => {
             return res.status(404).json({ message: 'Report not found' });
         }
 
-        // If status is Resolved or Dismissed, delete the report
-        if (status === 'Resolved' || status === 'Dismissed') {
-            await report.destroy();
-            console.log(`✅ [ReportController] Report ${caseId} deleted because status set to ${status}`);
-            return res.status(200).json({ message: `Report deleted successfully (Status: ${status})`, deleted: true });
-        }
-
         report.status = status;
         await report.save();
         
         res.status(200).json(report);
     } else {
-        const memReportIndex = memoryReports.findIndex(r => r.caseId === caseId);
-        if (memReportIndex !== -1) {
-            if (status === 'Resolved' || status === 'Dismissed') {
-                memoryReports.splice(memReportIndex, 1);
-                return res.status(200).json({ message: `Report deleted (Mock Mode, Status: ${status})`, deleted: true });
-            }
-            memoryReports[memReportIndex].status = status;
-            return res.status(200).json(memoryReports[memReportIndex]);
+        const memReport = memoryReports.find(r => r.caseId === caseId);
+        if (memReport) {
+            memReport.status = status;
+            return res.status(200).json(memReport);
         }
         return res.status(404).json({ message: 'Report not found' });
     }
